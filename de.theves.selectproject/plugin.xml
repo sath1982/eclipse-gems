@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            description="%openProjectCommand.description"
+            id="de.theves.selectproject.OpenProjectCommand"
+            name="%openProjectCommand.name">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.bindings">
+      <key
+            commandId="de.theves.selectproject.OpenProjectCommand"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+6">
+      </key>
+   </extension>
+   <extension
+         point="org.eclipse.ui.actionSets">
+      <actionSet
+            description="%actionSet.description"
+            id="de.theves.selectproject.actionSet"
+            label="%actionSet.label"
+            visible="true">
+         <action
+               class="de.theves.selectproject.internal.action.OpenProjectAction"
+               definitionId="de.theves.selectproject.OpenProjectCommand"
+               id="de.theves.selectproject.action1"
+               label="%openProjectAction.label"
+               tooltip="%openProjectAction.tooltip">
+         </action>
+      </actionSet>
+   </extension>
+
+</plugin>
