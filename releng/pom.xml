@@ -4,12 +4,13 @@
 		<groupId>de.theves.eclipse.gems</groupId>
 		<artifactId>de.theves.eclipse.gems.root</artifactId>
 		<version>0.3.0-SNAPSHOT</version>
+		<relativePath>../</relativePath>
 	</parent>
-	<artifactId>de.theves.eclipse.gems.bundles</artifactId>
+	<artifactId>de.theves.eclipse.gems.releng</artifactId>
 	<packaging>pom</packaging>
 
 	<modules>
-		<module>de.theves.eclipse.gems.selectproject</module>
-		<module>de.theves.eclipse.gems.metasearch</module>
+		<module>de.theves.eclipse.gems.parent</module>
+		<module>de.theves.eclipse.gems.updatesite</module>
 	</modules>
 </project> 
