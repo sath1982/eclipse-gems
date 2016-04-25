@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Eclipse Tiny Tools Project.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.theves.selectproject.internal.messages;
+package de.theves.eclipse.gems.selectproject.internal.messages;
 
 import org.eclipse.osgi.util.NLS;
 

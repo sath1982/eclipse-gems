@@ -26,7 +26,7 @@
             label="%actionSet.label"
             visible="true">
          <action
-               class="de.theves.selectproject.internal.action.OpenProjectAction"
+               class="de.theves.eclipse.gems.selectproject.internal.action.OpenProjectAction"
                definitionId="de.theves.selectproject.OpenProjectCommand"
                id="de.theves.selectproject.action1"
                label="%openProjectAction.label"

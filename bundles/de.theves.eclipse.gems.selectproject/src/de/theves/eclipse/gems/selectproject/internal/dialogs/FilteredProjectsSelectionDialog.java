@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Eclipse Tiny Tools Project.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.theves.selectproject.internal.dialogs;
+package de.theves.eclipse.gems.selectproject.internal.dialogs;
 
 import java.util.Comparator;
 
@@ -43,8 +43,8 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.dialogs.FilteredItemsSelectionDialog;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
 
-import de.theves.selectproject.internal.Activator;
-import de.theves.selectproject.internal.messages.Messages;
+import de.theves.eclipse.gems.selectproject.internal.Activator;
+import de.theves.eclipse.gems.selectproject.internal.messages.Messages;
 
 /**
  * FilteredProjectsSelectionDialog shows a dialog where you can enter a search

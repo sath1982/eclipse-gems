@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Eclipse Tiny Tools Project.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.theves.selectproject.internal.action;
+package de.theves.eclipse.gems.selectproject.internal.action;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
@@ -29,8 +29,8 @@ import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.ISetSelectionTarget;
 
-import de.theves.selectproject.internal.dialogs.FilteredProjectsSelectionDialog;
-import de.theves.selectproject.internal.messages.Messages;
+import de.theves.eclipse.gems.selectproject.internal.dialogs.FilteredProjectsSelectionDialog;
+import de.theves.eclipse.gems.selectproject.internal.messages.Messages;
 
 /**
  * OpenProjectAction opens a Eclipse Project.

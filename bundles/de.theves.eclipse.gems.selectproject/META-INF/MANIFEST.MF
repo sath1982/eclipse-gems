@@ -3,11 +3,11 @@ Bundle-ManifestVersion: 2
 Bundle-Name: %plugin.name
 Bundle-SymbolicName: de.theves.eclipse.gems.selectproject;singleton:=true
 Bundle-Version: 0.3.0.qualifier
-Bundle-Activator: de.theves.selectproject.internal.Activator
+Bundle-Activator: de.theves.eclipse.gems.selectproject.internal.Activator
 Bundle-Vendor: %plugin.provider
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.core.resources
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .
-Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8

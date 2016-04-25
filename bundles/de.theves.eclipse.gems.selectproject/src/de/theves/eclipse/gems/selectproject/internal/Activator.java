@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Eclipse Tiny Tools Project.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.theves.selectproject.internal;
+package de.theves.eclipse.gems.selectproject.internal;
 
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
