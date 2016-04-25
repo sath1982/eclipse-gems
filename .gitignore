@@ -1,3 +1,7 @@
 .idea/
 *.iml
 target/
+bin/
+features/de.theves.eclipse.gem.feature/features/
+features/de.theves.eclipse.gem.feature/plugins/
+*.jar
