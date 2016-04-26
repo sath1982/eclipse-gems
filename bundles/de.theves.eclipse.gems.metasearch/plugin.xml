@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            description="One search dialog to rule them all"
+            id="de.theves.eclipse.gems.metasearch.openSearchDialogId"
+            name="Open Search Command">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.bindings">
+      <key
+            commandId="de.theves.eclipse.gems.metasearch.openSearchDialogId"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+7">
+      </key>
+   </extension>
+   <extension
+         point="org.eclipse.ui.handlers">
+      <handler
+            class="de.theves.eclipse.gems.metasearch.OpenSearchDialogCommandHandler"
+            commandId="de.theves.eclipse.gems.metasearch.openSearchDialogId">
+      </handler>
+   </extension>
+
+</plugin>
