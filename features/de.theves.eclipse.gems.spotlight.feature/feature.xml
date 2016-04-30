@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
-      id="de.theves.eclipse.gems.feature"
+      id="de.theves.eclipse.gems.spotlight.feature"
       label="%feature.name"
       version="0.3.0.qualifier"
       provider-name="%feature.provider">
@@ -232,7 +232,7 @@ any resulting litigation.
    </requires>
 
    <plugin
-         id="de.theves.eclipse.gems.selectproject"
+         id="de.theves.eclipse.gems.spotlight"
          download-size="0"
          install-size="0"
          version="0.0.0"

@@ -11,5 +11,6 @@
 
     <modules>
         <module>de.theves.eclipse.gems.feature</module>
+        <module>de.theves.eclipse.gems.spotlight.feature</module>
     </modules>
 </project> 
