@@ -1,4 +1,4 @@
-package de.theves.eclipse.gems.metasearch;
+package de.theves.eclipse.gems.metasearch.internal;
 
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;

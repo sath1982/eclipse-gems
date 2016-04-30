@@ -1,4 +1,4 @@
-package de.theves.eclipse.gems.metasearch;
+package de.theves.eclipse.gems.metasearch.internal;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;

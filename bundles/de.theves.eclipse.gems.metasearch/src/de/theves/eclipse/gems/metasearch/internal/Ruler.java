@@ -1,4 +1,4 @@
-package de.theves.eclipse.gems.metasearch.model;
+package de.theves.eclipse.gems.metasearch.internal;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 

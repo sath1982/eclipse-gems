@@ -1,4 +1,4 @@
-package de.theves.eclipse.gems.metasearch;
+package de.theves.eclipse.gems.metasearch.internal;
 
 import java.util.Comparator;
 import java.util.List;
@@ -15,13 +15,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.dialogs.FilteredItemsSelectionDialog;
-
-import de.theves.eclipse.gems.metasearch.model.PerspectivesProvider;
-import de.theves.eclipse.gems.metasearch.model.ResourcesProvider;
-import de.theves.eclipse.gems.metasearch.model.Ruler;
-import de.theves.eclipse.gems.metasearch.model.SearchItem;
-import de.theves.eclipse.gems.metasearch.model.SearchItemProvider;
-import de.theves.eclipse.gems.metasearch.model.ViewProvider;
 
 public class SearchDialog extends FilteredItemsSelectionDialog {
 

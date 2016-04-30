@@ -1,12 +1,10 @@
-package de.theves.eclipse.gems.metasearch;
+package de.theves.eclipse.gems.metasearch.internal;
 
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.jface.resource.ResourceManager;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.swt.graphics.Image;
-
-import de.theves.eclipse.gems.metasearch.model.SearchItem;
 
 public class SearchItemLabelProvider extends LabelProvider {
 	private ResourceManager resourceManager;
