@@ -1,8 +1,8 @@
-package de.theves.eclipse.gems.metasearch.internal;
+package de.theves.eclipse.gems.spotlight.internal;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 
-public class Ruler extends SearchItem {
+public class Ruler extends SpotlightItem {
 
 	private String headline;
 

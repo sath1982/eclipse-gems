@@ -1,4 +1,4 @@
-package de.theves.eclipse.gems.metasearch.internal;
+package de.theves.eclipse.gems.spotlight.internal;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
@@ -11,7 +11,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.model.IWorkbenchAdapter;
 import org.eclipse.ui.part.FileEditorInput;
 
-public class ResourceItem extends SearchItem {
+public class ResourceItem extends SpotlightItem {
 	private IFile resource;
 
 	public ResourceItem(ResourcesProvider provider, IFile res) {

@@ -1,9 +1,9 @@
-package de.theves.eclipse.gems.metasearch.internal;
+package de.theves.eclipse.gems.spotlight.internal;
 
 import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.resource.ImageDescriptor;
 
-public class ActionItem extends SearchItem {
+public class ActionItem extends SpotlightItem {
 	private ActionContributionItem action;
 
 	public ActionItem(ActionsProvider provider, ActionContributionItem action) {
@@ -13,7 +13,7 @@ public class ActionItem extends SearchItem {
 
 	@Override
 	public String getLabel() {
-		return action.getAction().getText();
+		return this.action.getAction().getText();
 	}
 
 	@Override

@@ -1,4 +1,4 @@
-package de.theves.eclipse.gems.metasearch.internal;
+package de.theves.eclipse.gems.spotlight.internal;
 
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
@@ -6,13 +6,13 @@ import org.eclipse.jface.resource.ResourceManager;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.swt.graphics.Image;
 
-public class SearchItemLabelProvider extends LabelProvider {
+public class SpotlightItemLabelProvider extends LabelProvider {
 	private ResourceManager resourceManager;
 
 	@Override
 	public Image getImage(Object element) {
-		if (element instanceof SearchItem) {
-			SearchItem item = (SearchItem) element;
+		if (element instanceof SpotlightItem) {
+			SpotlightItem item = (SpotlightItem) element;
 			if (null != item.getImage()) {
 				return (Image) getResourceManager().get(item.getImage());
 			}
@@ -22,8 +22,8 @@ public class SearchItemLabelProvider extends LabelProvider {
 
 	@Override
 	public String getText(Object element) {
-		if (element instanceof SearchItem) {
-			SearchItem item = (SearchItem) element;
+		if (element instanceof SpotlightItem) {
+			SpotlightItem item = (SpotlightItem) element;
 			return item.getLabel() + " - " + item.getProvider().getLabel();
 		}
 		return super.getText(element);

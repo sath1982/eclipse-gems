@@ -1,4 +1,4 @@
-package de.theves.eclipse.gems.metasearch.internal;
+package de.theves.eclipse.gems.spotlight.internal;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -15,7 +15,7 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.WorkbenchWindow;
 
-public class ActionsProvider implements SearchItemProvider {
+public class ActionsProvider implements SpotlightItemProvider {
 	private IWorkbenchWindow window;
 
 	public ActionsProvider(IWorkbenchWindow window) {
@@ -23,8 +23,8 @@ public class ActionsProvider implements SearchItemProvider {
 	}
 
 	@Override
-	public List<SearchItem> getItems() {
-		List<SearchItem> items = new ArrayList<>();
+	public List<SpotlightItem> getItems() {
+		List<SpotlightItem> items = new ArrayList<>();
 		IWorkbenchWindow window = this.window;
 		if (window instanceof WorkbenchWindow) {
 			MenuManager menu = ((WorkbenchWindow) window).getMenuManager();

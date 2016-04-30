@@ -1,11 +1,11 @@
-package de.theves.eclipse.gems.metasearch.internal;
+package de.theves.eclipse.gems.spotlight.internal;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.views.IViewDescriptor;
 
-public class ViewItem extends SearchItem {
+public class ViewItem extends SpotlightItem {
 	private IViewDescriptor view;
 
 	public ViewItem(ViewProvider provider, IViewDescriptor view) {

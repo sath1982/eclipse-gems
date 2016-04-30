@@ -1,10 +1,10 @@
-package de.theves.eclipse.gems.metasearch.internal;
+package de.theves.eclipse.gems.spotlight.internal;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.IPerspectiveDescriptor;
 import org.eclipse.ui.PlatformUI;
 
-public class PerspectiveItem extends SearchItem {
+public class PerspectiveItem extends SpotlightItem {
 	private IPerspectiveDescriptor perspective;
 
 	public PerspectiveItem(PerspectivesProvider provider, IPerspectiveDescriptor perspective) {

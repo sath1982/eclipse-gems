@@ -1,4 +1,4 @@
-package de.theves.eclipse.gems.metasearch.internal;
+package de.theves.eclipse.gems.spotlight.internal;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
@@ -12,10 +12,10 @@ public class OpenSearchDialogCommandHandler extends AbstractHandler {
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		IWorkbenchWindow window = HandlerUtil.getActiveWorkbenchWindowChecked(event);
-		SearchDialog dialog = new SearchDialog(window, window.getShell(), false);
+		SpotlightView dialog = new SpotlightView(window, window.getShell(), false);
 		dialog.setTitle("Eclipse Gems Spotlight");
 		if (dialog.open() == Window.OK) {
-			SearchItem searchItem = (SearchItem) dialog.getFirstResult();
+			SpotlightItem searchItem = (SpotlightItem) dialog.getFirstResult();
 			if (searchItem != null) {
 				searchItem.show();
 			}

@@ -10,6 +10,6 @@
 
 	<modules>
 		<module>de.theves.eclipse.gems.selectproject</module>
-		<module>de.theves.eclipse.gems.metasearch</module>
+		<module>de.theves.eclipse.gems.spotlight</module>
 	</modules>
 </project> 

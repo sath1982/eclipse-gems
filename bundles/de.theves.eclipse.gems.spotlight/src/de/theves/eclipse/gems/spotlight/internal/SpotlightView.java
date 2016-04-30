@@ -1,4 +1,4 @@
-package de.theves.eclipse.gems.metasearch.internal;
+package de.theves.eclipse.gems.spotlight.internal;
 
 import java.util.Comparator;
 import java.util.List;
@@ -17,13 +17,13 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.dialogs.FilteredItemsSelectionDialog;
 
-public class SearchDialog extends FilteredItemsSelectionDialog {
+public class SpotlightView extends FilteredItemsSelectionDialog {
 	private IWorkbenchWindow activeWindow;
 
-	public SearchDialog(IWorkbenchWindow activeWindow, Shell shell, boolean multi) {
+	public SpotlightView(IWorkbenchWindow activeWindow, Shell shell, boolean multi) {
 		super(shell, multi);
-		setListLabelProvider(new SearchItemLabelProvider());
-		setDetailsLabelProvider(new SearchItemLabelProvider());
+		setListLabelProvider(new SpotlightItemLabelProvider());
+		setDetailsLabelProvider(new SpotlightItemLabelProvider());
 		this.activeWindow = activeWindow;
 	}
 
@@ -49,7 +49,7 @@ public class SearchDialog extends FilteredItemsSelectionDialog {
 
 			@Override
 			public boolean matchItem(Object item) {
-				return matches(((SearchItem) item).getLabel());
+				return matches(((SpotlightItem) item).getLabel());
 			}
 
 			@Override
@@ -61,10 +61,10 @@ public class SearchDialog extends FilteredItemsSelectionDialog {
 	}
 
 	@Override
-	protected Comparator<SearchItem> getItemsComparator() {
-		return new Comparator<SearchItem>() {
+	protected Comparator<SpotlightItem> getItemsComparator() {
+		return new Comparator<SpotlightItem>() {
 			@Override
-			public int compare(SearchItem o1, SearchItem o2) {
+			public int compare(SpotlightItem o1, SpotlightItem o2) {
 				return o1.compareTo(o2);
 			}
 		};
@@ -76,15 +76,16 @@ public class SearchDialog extends FilteredItemsSelectionDialog {
 		IProgressMonitor safeMonitor = progressMonitor == null ? new NullProgressMonitor() : progressMonitor;
 		SubProgressMonitor subProgressMonitor = null;
 		try {
-			SearchItemProvider[] providers = new SearchItemProvider[] { new ViewProvider(), new ResourcesProvider(),
-					new PerspectivesProvider(), new ActionsProvider(this.activeWindow) };
+			SpotlightItemProvider[] providers = new SpotlightItemProvider[] { new ViewProvider(), new ResourcesProvider(),
+					new PerspectivesProvider(), new ActionsProvider(this.activeWindow),
+					new CommandProvider(this.activeWindow) };
 			safeMonitor.beginTask(null, providers.length);
 			for (int i = 0; i < providers.length; i++) {
 				// add a ruler for each provider
 				contentProvider.add(new Ruler(providers[i].getLabel()), itemsFilter);
 				// add the items
-				List<SearchItem> items = providers[i].getItems();
-				for (SearchItem searchItem : items) {
+				List<SpotlightItem> items = providers[i].getItems();
+				for (SpotlightItem searchItem : items) {
 					contentProvider.add(searchItem, itemsFilter);
 				}
 				safeMonitor.worked(1);
@@ -100,7 +101,7 @@ public class SearchDialog extends FilteredItemsSelectionDialog {
 
 	@Override
 	public String getElementName(Object item) {
-		return ((SearchItem) item).getLabel();
+		return ((SpotlightItem) item).getLabel();
 	}
 
 }

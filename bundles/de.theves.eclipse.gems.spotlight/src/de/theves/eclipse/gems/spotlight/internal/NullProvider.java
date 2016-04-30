@@ -1,13 +1,13 @@
-package de.theves.eclipse.gems.metasearch.internal;
+package de.theves.eclipse.gems.spotlight.internal;
 
 import java.util.Collections;
 import java.util.List;
 
-public class NullProvider implements SearchItemProvider {
+public class NullProvider implements SpotlightItemProvider {
 	private static final String NOTHING = "";
 
 	@Override
-	public List<SearchItem> getItems() {
+	public List<SpotlightItem> getItems() {
 		return Collections.emptyList();
 	}
 
