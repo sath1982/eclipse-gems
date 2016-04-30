@@ -25,18 +25,7 @@ public class ActionsProvider implements SearchItemProvider {
 			Set<ActionContributionItem> result = new HashSet<ActionContributionItem>();
 			collectContributions(menu, result);
 			for (ActionContributionItem action : result) {
-				items.add(new SearchItem() {
-
-					@Override
-					public String getLabel() {
-						return action.getAction().getText();
-					}
-
-					@Override
-					public ImageDescriptor getImage() {
-						return action.getAction().getImageDescriptor();
-					}
-				});
+				items.add(new ActionItem(this, action));
 			}
 		}
 		return items;

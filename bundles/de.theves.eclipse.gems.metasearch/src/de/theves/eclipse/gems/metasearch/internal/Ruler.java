@@ -7,6 +7,7 @@ public class Ruler extends SearchItem {
 	private String headline;
 
 	public Ruler(String headline) {
+		super(new NullProvider());
 		this.headline = headline;
 	}
 
@@ -18,6 +19,11 @@ public class Ruler extends SearchItem {
 	@Override
 	public String getLabel() {
 		return "--------------------------------------" + this.headline + "--------------------------------------";
+	}
+
+	@Override
+	public void show() {
+		// nothing to show here
 	}
 
 }

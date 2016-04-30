@@ -24,7 +24,7 @@ public class SearchItemLabelProvider extends LabelProvider {
 	public String getText(Object element) {
 		if (element instanceof SearchItem) {
 			SearchItem item = (SearchItem) element;
-			return item.getLabel();
+			return item.getLabel() + " - " + item.getProvider().getLabel();
 		}
 		return super.getText(element);
 	}
