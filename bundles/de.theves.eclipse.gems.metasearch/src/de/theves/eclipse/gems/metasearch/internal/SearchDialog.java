@@ -74,7 +74,7 @@ public class SearchDialog extends FilteredItemsSelectionDialog {
 		SubProgressMonitor subProgressMonitor = null;
 		try {
 			SearchItemProvider[] providers = new SearchItemProvider[] { new ViewProvider(), new ResourcesProvider(),
-					new PerspectivesProvider() };
+					new PerspectivesProvider(), new ActionsProvider() };
 			safeMonitor.beginTask(null, providers.length);
 			for (int i = 0; i < providers.length; i++) {
 				// add a ruler for each provider
