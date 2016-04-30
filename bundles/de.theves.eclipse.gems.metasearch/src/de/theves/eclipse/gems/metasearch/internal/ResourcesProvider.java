@@ -3,6 +3,7 @@ package de.theves.eclipse.gems.metasearch.internal;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -19,7 +20,7 @@ public class ResourcesProvider implements SearchItemProvider {
 				@Override
 				public boolean visit(IResource resource) throws CoreException {
 					if (resource.getType() == IResource.FILE) {
-						items.add(new ResourceItem(ResourcesProvider.this, resource));
+						items.add(new ResourceItem(ResourcesProvider.this, (IFile) resource));
 					}
 					return resource.getType() != IResource.FILE;
 				}

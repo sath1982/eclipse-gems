@@ -1,13 +1,20 @@
 package de.theves.eclipse.gems.metasearch.internal;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.ui.IEditorDescriptor;
+import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.model.IWorkbenchAdapter;
+import org.eclipse.ui.part.FileEditorInput;
 
 public class ResourceItem extends SearchItem {
-	private IResource resource;
+	private IFile resource;
 
-	public ResourceItem(ResourcesProvider provider, IResource res) {
+	public ResourceItem(ResourcesProvider provider, IFile res) {
 		super(provider);
 		this.resource = res;
 	}
@@ -32,8 +39,18 @@ public class ResourceItem extends SearchItem {
 
 	@Override
 	public void show() {
-		// TODO Auto-generated method stub
-
+		IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+		IEditorDescriptor desc = PlatformUI.getWorkbench().getEditorRegistry()
+				.getDefaultEditor(this.resource.getName());
+		if (desc != null) {
+			try {
+				IEditorInput input = new FileEditorInput(this.resource);
+				page.openEditor(input, desc.getId());
+			} catch (PartInitException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 	}
 
 }

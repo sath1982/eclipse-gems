@@ -7,6 +7,9 @@ Bundle-Activator: de.theves.eclipse.gems.metasearch.internal.Activator
 Bundle-Vendor: Sascha Theves
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
- org.eclipse.core.resources
+ org.eclipse.core.resources,
+ org.eclipse.ui.editors,
+ org.eclipse.core.filesystem,
+ org.eclipse.ui.ide
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
