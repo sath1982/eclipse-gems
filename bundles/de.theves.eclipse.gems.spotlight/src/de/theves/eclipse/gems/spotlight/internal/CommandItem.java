@@ -6,6 +6,7 @@ import org.eclipse.core.commands.NotHandledException;
 import org.eclipse.core.commands.ParameterizedCommand;
 import org.eclipse.core.commands.common.NotDefinedException;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.commands.ICommandImageService;
 import org.eclipse.ui.handlers.IHandlerService;
@@ -28,10 +29,15 @@ public class CommandItem extends SpotlightItem {
 	}
 
 	@Override
-	public ImageDescriptor getImage() {
+	public ImageDescriptor doGetImage() {
 		CommandProvider cp = (CommandProvider) this.provider;
 		ICommandImageService service = cp.getCommandImageService();
-		return service.getImageDescriptor(this.command.getId());
+		ImageDescriptor imageDescriptor = service.getImageDescriptor(this.command.getId());
+		if (null == imageDescriptor) {
+			// fallback to default command image
+			return PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJ_ELEMENT);
+		}
+		return imageDescriptor;
 	}
 
 	@Override

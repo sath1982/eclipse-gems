@@ -48,6 +48,10 @@ public class CommandProvider implements SpotlightItemProvider {
 	public ICommandImageService getCommandImageService() {
 		return this.window.getService(ICommandImageService.class);
 	}
+	
+	public IWorkbenchWindow getWindow() {
+		return window;
+	}
 
 	@Override
 	public String getLabel() {

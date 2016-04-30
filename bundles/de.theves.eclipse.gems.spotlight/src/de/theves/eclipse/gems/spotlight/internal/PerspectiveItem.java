@@ -18,7 +18,7 @@ public class PerspectiveItem extends SpotlightItem {
 	}
 
 	@Override
-	public ImageDescriptor getImage() {
+	public ImageDescriptor doGetImage() {
 		return this.perspective.getImageDescriptor();
 	}
 

@@ -19,7 +19,7 @@ public class ViewItem extends SpotlightItem {
 	}
 
 	@Override
-	public ImageDescriptor getImage() {
+	public ImageDescriptor doGetImage() {
 		return this.view.getImageDescriptor();
 	}
 

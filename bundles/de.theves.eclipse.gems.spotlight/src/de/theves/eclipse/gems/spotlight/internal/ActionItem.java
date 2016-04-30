@@ -17,7 +17,7 @@ public class ActionItem extends SpotlightItem {
 	}
 
 	@Override
-	public ImageDescriptor getImage() {
+	public ImageDescriptor doGetImage() {
 		return action.getAction().getImageDescriptor();
 	}
 

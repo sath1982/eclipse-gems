@@ -13,6 +13,12 @@ public class Ruler extends SpotlightItem {
 
 	@Override
 	public ImageDescriptor getImage() {
+		// no images for rulers
+		return null;
+	}
+
+	@Override
+	public ImageDescriptor doGetImage() {
 		return null;
 	}
 

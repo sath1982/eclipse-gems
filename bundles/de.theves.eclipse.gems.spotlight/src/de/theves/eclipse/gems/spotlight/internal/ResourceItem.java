@@ -25,7 +25,7 @@ public class ResourceItem extends SpotlightItem {
 	}
 
 	@Override
-	public ImageDescriptor getImage() {
+	public ImageDescriptor doGetImage() {
 		IWorkbenchAdapter adapter = getAdapter(resource);
 		if (null == adapter) {
 			return null;
