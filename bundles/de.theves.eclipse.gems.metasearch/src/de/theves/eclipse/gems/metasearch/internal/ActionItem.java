@@ -23,7 +23,7 @@ public class ActionItem extends SearchItem {
 
 	@Override
 	public void show() {
-		// TODO Auto-generated method stub
+		this.action.getAction().run();
 	}
 
 }

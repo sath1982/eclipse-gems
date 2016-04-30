@@ -14,14 +14,17 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.dialogs.FilteredItemsSelectionDialog;
 
 public class SearchDialog extends FilteredItemsSelectionDialog {
+	private IWorkbenchWindow activeWindow;
 
-	public SearchDialog(Shell shell, boolean multi) {
+	public SearchDialog(IWorkbenchWindow activeWindow, Shell shell, boolean multi) {
 		super(shell, multi);
 		setListLabelProvider(new SearchItemLabelProvider());
 		setDetailsLabelProvider(new SearchItemLabelProvider());
+		this.activeWindow = activeWindow;
 	}
 
 	@Override
@@ -74,7 +77,7 @@ public class SearchDialog extends FilteredItemsSelectionDialog {
 		SubProgressMonitor subProgressMonitor = null;
 		try {
 			SearchItemProvider[] providers = new SearchItemProvider[] { new ViewProvider(), new ResourcesProvider(),
-					new PerspectivesProvider(), new ActionsProvider() };
+					new PerspectivesProvider(), new ActionsProvider(this.activeWindow) };
 			safeMonitor.beginTask(null, providers.length);
 			for (int i = 0; i < providers.length; i++) {
 				// add a ruler for each provider

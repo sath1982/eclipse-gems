@@ -10,16 +10,22 @@ import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.SubContributionItem;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.WorkbenchWindow;
 
 public class ActionsProvider implements SearchItemProvider {
+	private IWorkbenchWindow window;
+
+	public ActionsProvider(IWorkbenchWindow window) {
+		this.window = window;
+	}
 
 	@Override
 	public List<SearchItem> getItems() {
 		List<SearchItem> items = new ArrayList<>();
-		IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+		IWorkbenchWindow window = this.window;
 		if (window instanceof WorkbenchWindow) {
 			MenuManager menu = ((WorkbenchWindow) window).getMenuManager();
 			Set<ActionContributionItem> result = new HashSet<ActionContributionItem>();

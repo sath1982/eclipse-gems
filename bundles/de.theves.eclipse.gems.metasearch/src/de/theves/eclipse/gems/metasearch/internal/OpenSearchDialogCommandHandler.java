@@ -12,7 +12,7 @@ public class OpenSearchDialogCommandHandler extends AbstractHandler {
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		IWorkbenchWindow window = HandlerUtil.getActiveWorkbenchWindowChecked(event);
-		SearchDialog dialog = new SearchDialog(window.getShell(), false);
+		SearchDialog dialog = new SearchDialog(window, window.getShell(), false);
 		dialog.setTitle("Eclipse Gems Spotlight");
 		if (dialog.open() == Window.OK) {
 			SearchItem searchItem = (SearchItem) dialog.getFirstResult();
