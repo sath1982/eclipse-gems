@@ -1,9 +1,8 @@
 package de.theves.eclipse.gems.metasearch;
 
 import java.util.Comparator;
+import java.util.List;
 
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -16,14 +15,20 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.dialogs.FilteredItemsSelectionDialog;
-import org.eclipse.ui.model.WorkbenchLabelProvider;
+
+import de.theves.eclipse.gems.metasearch.model.PerspectivesProvider;
+import de.theves.eclipse.gems.metasearch.model.ResourcesProvider;
+import de.theves.eclipse.gems.metasearch.model.Ruler;
+import de.theves.eclipse.gems.metasearch.model.SearchItem;
+import de.theves.eclipse.gems.metasearch.model.SearchItemProvider;
+import de.theves.eclipse.gems.metasearch.model.ViewProvider;
 
 public class SearchDialog extends FilteredItemsSelectionDialog {
 
 	public SearchDialog(Shell shell, boolean multi) {
 		super(shell, multi);
-		setListLabelProvider(new WorkbenchLabelProvider());
-		setDetailsLabelProvider(new WorkbenchLabelProvider());
+		setListLabelProvider(new SearchItemLabelProvider());
+		setDetailsLabelProvider(new SearchItemLabelProvider());
 	}
 
 	@Override
@@ -44,32 +49,50 @@ public class SearchDialog extends FilteredItemsSelectionDialog {
 
 	@Override
 	protected ItemsFilter createFilter() {
-		// TODO Auto-generated method stub
-		return null;
+		return new ItemsFilter() {
+
+			@Override
+			public boolean matchItem(Object item) {
+				return matches(((SearchItem) item).getLabel());
+			}
+
+			@Override
+			public boolean isConsistentItem(Object item) {
+				// out items are always consistent
+				return true;
+			}
+		};
 	}
 
 	@Override
-	protected Comparator getItemsComparator() {
-		// TODO Auto-generated method stub
-		return null;
+	protected Comparator<SearchItem> getItemsComparator() {
+		return new Comparator<SearchItem>() {
+			@Override
+			public int compare(SearchItem o1, SearchItem o2) {
+				return o1.compareTo(o2);
+			}
+		};
 	}
 
 	@Override
 	protected void fillContentProvider(AbstractContentProvider contentProvider, ItemsFilter itemsFilter,
 			IProgressMonitor progressMonitor) throws CoreException {
-		IProgressMonitor safeMonitor = progressMonitor == null ? new NullProgressMonitor()
-				: progressMonitor;
+		IProgressMonitor safeMonitor = progressMonitor == null ? new NullProgressMonitor() : progressMonitor;
 		SubProgressMonitor subProgressMonitor = null;
 		try {
-			safeMonitor.beginTask(null, 2);
-			IResource[] wsProjects = ResourcesPlugin.getWorkspace().getRoot()
-					.members();
-			safeMonitor.worked(1);
-			subProgressMonitor = new SubProgressMonitor(safeMonitor,
-					wsProjects.length);
-			for (IResource project : wsProjects) {
-				contentProvider.add(project, itemsFilter);
-				subProgressMonitor.worked(1);
+			SearchItemProvider[] providers = new SearchItemProvider[] { new ViewProvider(), new ResourcesProvider(),
+					new PerspectivesProvider() };
+			safeMonitor.beginTask(null, providers.length);
+			for (int i = 0; i < providers.length; i++) {
+				// add a ruler for each provider
+				contentProvider.add(new Ruler(providers[i].getLabel()), itemsFilter);
+				// add the items
+				List<SearchItem> items = providers[i].getItems();
+				for (SearchItem searchItem : items) {
+					contentProvider.add(searchItem, itemsFilter);
+				}
+				safeMonitor.worked(1);
+
 			}
 		} finally {
 			safeMonitor.done();
@@ -81,8 +104,7 @@ public class SearchDialog extends FilteredItemsSelectionDialog {
 
 	@Override
 	public String getElementName(Object item) {
-		// TODO Auto-generated method stub
-		return item.toString();
+		return ((SearchItem) item).getLabel();
 	}
 
 }
