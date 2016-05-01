@@ -20,6 +20,7 @@ import org.eclipse.ui.dialogs.FilteredItemsSelectionDialog;
 import de.theves.eclipse.gems.spotlight.internal.Activator;
 import de.theves.eclipse.gems.spotlight.internal.providers.ActionsProvider;
 import de.theves.eclipse.gems.spotlight.internal.providers.CommandProvider;
+import de.theves.eclipse.gems.spotlight.internal.providers.JavaTypesProvider;
 import de.theves.eclipse.gems.spotlight.internal.providers.PerspectivesProvider;
 import de.theves.eclipse.gems.spotlight.internal.providers.ResourcesProvider;
 import de.theves.eclipse.gems.spotlight.internal.providers.ViewProvider;
@@ -83,15 +84,15 @@ public class SpotlightView extends FilteredItemsSelectionDialog {
 		IProgressMonitor safeMonitor = progressMonitor == null ? new NullProgressMonitor() : progressMonitor;
 		SubProgressMonitor subProgressMonitor = null;
 		try {
-			SpotlightItemProvider[] providers = new SpotlightItemProvider[] { new ViewProvider(), new ResourcesProvider(),
-					new PerspectivesProvider(), new ActionsProvider(this.activeWindow),
-					new CommandProvider(this.activeWindow) };
+			SpotlightItemProvider[] providers = new SpotlightItemProvider[] { new ViewProvider(),
+					new ResourcesProvider(), new PerspectivesProvider(), new ActionsProvider(this.activeWindow),
+					new CommandProvider(this.activeWindow), new JavaTypesProvider() };
 			safeMonitor.beginTask(null, providers.length);
 			for (int i = 0; i < providers.length; i++) {
 				// add a ruler for each provider
 				contentProvider.add(new Ruler(providers[i].getLabel()), itemsFilter);
 				// add the items
-				List<SpotlightItem> items = providers[i].getItems();
+				List<? extends SpotlightItem> items = providers[i].getItems();
 				for (SpotlightItem searchItem : items) {
 					contentProvider.add(searchItem, itemsFilter);
 				}
