@@ -1,6 +1,8 @@
-package de.theves.eclipse.gems.spotlight.internal;
+package de.theves.eclipse.gems.spotlight.internal.view;
 
 import org.eclipse.jface.resource.ImageDescriptor;
+
+import de.theves.eclipse.gems.spotlight.internal.providers.NullProvider;
 
 public class Ruler extends SpotlightItem {
 

@@ -21,7 +21,7 @@
    <extension
          point="org.eclipse.ui.handlers">
       <handler
-            class="de.theves.eclipse.gems.spotlight.internal.OpenSearchDialogCommandHandler"
+            class="de.theves.eclipse.gems.spotlight.internal.commands.OpenSearchDialogCommandHandler"
             commandId="de.theves.eclipse.gems.metasearch.openSearchDialogId">
       </handler>
    </extension>

@@ -1,4 +1,4 @@
-package de.theves.eclipse.gems.spotlight.internal;
+package de.theves.eclipse.gems.spotlight.internal.providers;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -12,6 +12,9 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.commands.ICommandImageService;
 import org.eclipse.ui.commands.ICommandService;
+
+import de.theves.eclipse.gems.spotlight.internal.view.SpotlightItem;
+import de.theves.eclipse.gems.spotlight.internal.view.SpotlightItemProvider;
 
 public class CommandProvider implements SpotlightItemProvider {
 	private IWorkbenchWindow window;

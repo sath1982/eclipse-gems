@@ -1,9 +1,11 @@
-package de.theves.eclipse.gems.spotlight.internal;
+package de.theves.eclipse.gems.spotlight.internal.providers;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.views.IViewDescriptor;
+
+import de.theves.eclipse.gems.spotlight.internal.view.SpotlightItem;
 
 public class ViewItem extends SpotlightItem {
 	private IViewDescriptor view;

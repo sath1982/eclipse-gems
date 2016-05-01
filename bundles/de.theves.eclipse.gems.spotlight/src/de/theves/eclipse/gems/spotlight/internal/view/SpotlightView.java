@@ -1,4 +1,4 @@
-package de.theves.eclipse.gems.spotlight.internal;
+package de.theves.eclipse.gems.spotlight.internal.view;
 
 import java.util.Comparator;
 import java.util.List;
@@ -16,6 +16,13 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.dialogs.FilteredItemsSelectionDialog;
+
+import de.theves.eclipse.gems.spotlight.internal.Activator;
+import de.theves.eclipse.gems.spotlight.internal.providers.ActionsProvider;
+import de.theves.eclipse.gems.spotlight.internal.providers.CommandProvider;
+import de.theves.eclipse.gems.spotlight.internal.providers.PerspectivesProvider;
+import de.theves.eclipse.gems.spotlight.internal.providers.ResourcesProvider;
+import de.theves.eclipse.gems.spotlight.internal.providers.ViewProvider;
 
 public class SpotlightView extends FilteredItemsSelectionDialog {
 	private IWorkbenchWindow activeWindow;

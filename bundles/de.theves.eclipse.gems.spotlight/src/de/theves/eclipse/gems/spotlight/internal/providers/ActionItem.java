@@ -1,7 +1,9 @@
-package de.theves.eclipse.gems.spotlight.internal;
+package de.theves.eclipse.gems.spotlight.internal.providers;
 
 import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.resource.ImageDescriptor;
+
+import de.theves.eclipse.gems.spotlight.internal.view.SpotlightItem;
 
 public class ActionItem extends SpotlightItem {
 	private ActionContributionItem action;

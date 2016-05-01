@@ -1,4 +1,4 @@
-package de.theves.eclipse.gems.spotlight.internal;
+package de.theves.eclipse.gems.spotlight.internal.providers;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
@@ -10,6 +10,8 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.model.IWorkbenchAdapter;
 import org.eclipse.ui.part.FileEditorInput;
+
+import de.theves.eclipse.gems.spotlight.internal.view.SpotlightItem;
 
 public class ResourceItem extends SpotlightItem {
 	private IFile resource;

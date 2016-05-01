@@ -1,10 +1,13 @@
-package de.theves.eclipse.gems.spotlight.internal;
+package de.theves.eclipse.gems.spotlight.internal.providers;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.ui.IPerspectiveDescriptor;
 import org.eclipse.ui.PlatformUI;
+
+import de.theves.eclipse.gems.spotlight.internal.view.SpotlightItem;
+import de.theves.eclipse.gems.spotlight.internal.view.SpotlightItemProvider;
 
 public class PerspectivesProvider implements SpotlightItemProvider {
 

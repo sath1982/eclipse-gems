@@ -1,4 +1,4 @@
-package de.theves.eclipse.gems.spotlight.internal;
+package de.theves.eclipse.gems.spotlight.internal.providers;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -9,11 +9,11 @@ import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.SubContributionItem;
-import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.swt.widgets.Shell;
+import org.eclipse.jface.window.ApplicationWindow;
 import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.internal.WorkbenchWindow;
+
+import de.theves.eclipse.gems.spotlight.internal.view.SpotlightItem;
+import de.theves.eclipse.gems.spotlight.internal.view.SpotlightItemProvider;
 
 public class ActionsProvider implements SpotlightItemProvider {
 	private IWorkbenchWindow window;
@@ -26,8 +26,8 @@ public class ActionsProvider implements SpotlightItemProvider {
 	public List<SpotlightItem> getItems() {
 		List<SpotlightItem> items = new ArrayList<>();
 		IWorkbenchWindow window = this.window;
-		if (window instanceof WorkbenchWindow) {
-			MenuManager menu = ((WorkbenchWindow) window).getMenuManager();
+		if (window instanceof ApplicationWindow) {
+			MenuManager menu = ((ApplicationWindow) window).getMenuBarManager();
 			Set<ActionContributionItem> result = new HashSet<ActionContributionItem>();
 			collectContributions(menu, result);
 			for (ActionContributionItem action : result) {

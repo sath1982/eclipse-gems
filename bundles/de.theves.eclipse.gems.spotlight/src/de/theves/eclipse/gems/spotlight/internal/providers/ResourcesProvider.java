@@ -1,4 +1,4 @@
-package de.theves.eclipse.gems.spotlight.internal;
+package de.theves.eclipse.gems.spotlight.internal.providers;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,6 +9,9 @@ import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ui.model.IWorkbenchAdapter;
+
+import de.theves.eclipse.gems.spotlight.internal.view.SpotlightItem;
+import de.theves.eclipse.gems.spotlight.internal.view.SpotlightItemProvider;
 
 public class ResourcesProvider implements SpotlightItemProvider {
 

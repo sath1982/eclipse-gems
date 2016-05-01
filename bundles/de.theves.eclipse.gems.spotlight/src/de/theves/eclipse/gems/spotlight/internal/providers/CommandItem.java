@@ -1,4 +1,4 @@
-package de.theves.eclipse.gems.spotlight.internal;
+package de.theves.eclipse.gems.spotlight.internal.providers;
 
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.NotEnabledException;
@@ -10,6 +10,8 @@ import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.commands.ICommandImageService;
 import org.eclipse.ui.handlers.IHandlerService;
+
+import de.theves.eclipse.gems.spotlight.internal.view.SpotlightItem;
 
 public class CommandItem extends SpotlightItem {
 	private ParameterizedCommand command;

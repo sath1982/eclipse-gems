@@ -1,8 +1,10 @@
-package de.theves.eclipse.gems.spotlight.internal;
+package de.theves.eclipse.gems.spotlight.internal.providers;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.IPerspectiveDescriptor;
 import org.eclipse.ui.PlatformUI;
+
+import de.theves.eclipse.gems.spotlight.internal.view.SpotlightItem;
 
 public class PerspectiveItem extends SpotlightItem {
 	private IPerspectiveDescriptor perspective;
