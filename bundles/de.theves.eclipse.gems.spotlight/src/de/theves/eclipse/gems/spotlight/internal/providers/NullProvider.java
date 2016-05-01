@@ -1,22 +1,24 @@
 package de.theves.eclipse.gems.spotlight.internal.providers;
 
-import java.util.Collections;
 import java.util.List;
+
+import org.eclipse.core.runtime.IProgressMonitor;
 
 import de.theves.eclipse.gems.spotlight.internal.view.SpotlightItem;
 import de.theves.eclipse.gems.spotlight.internal.view.SpotlightItemProvider;
+import de.theves.eclipse.gems.spotlight.internal.view.SpotlightView.SpotlightItemsFilter;
 
 public class NullProvider implements SpotlightItemProvider {
-	private static final String NOTHING = "";
-
 	@Override
-	public List<SpotlightItem> getItems() {
-		return Collections.emptyList();
+	public List<SpotlightItem> getItems(SpotlightItemsFilter filter, IProgressMonitor monitor) {
+		// what a suprise ;-)
+		return null;
 	}
 
 	@Override
 	public String getLabel() {
-		return NOTHING;
+		// what a suprise ;-)
+		return null;
 	}
 
 }

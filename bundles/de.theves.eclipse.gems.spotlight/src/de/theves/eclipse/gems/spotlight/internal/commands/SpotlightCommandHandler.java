@@ -10,7 +10,7 @@ import org.eclipse.ui.handlers.HandlerUtil;
 import de.theves.eclipse.gems.spotlight.internal.view.SpotlightItem;
 import de.theves.eclipse.gems.spotlight.internal.view.SpotlightView;
 
-public class OpenSearchDialogCommandHandler extends AbstractHandler {
+public class SpotlightCommandHandler extends AbstractHandler {
 
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {

@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.MenuManager;
@@ -14,6 +15,7 @@ import org.eclipse.ui.IWorkbenchWindow;
 
 import de.theves.eclipse.gems.spotlight.internal.view.SpotlightItem;
 import de.theves.eclipse.gems.spotlight.internal.view.SpotlightItemProvider;
+import de.theves.eclipse.gems.spotlight.internal.view.SpotlightView.SpotlightItemsFilter;
 
 public class ActionsProvider implements SpotlightItemProvider {
 	private IWorkbenchWindow window;
@@ -23,7 +25,7 @@ public class ActionsProvider implements SpotlightItemProvider {
 	}
 
 	@Override
-	public List<SpotlightItem> getItems() {
+	public List<SpotlightItem> getItems(SpotlightItemsFilter filter, IProgressMonitor monitor) {
 		List<SpotlightItem> items = new ArrayList<>();
 		IWorkbenchWindow window = this.window;
 		if (window instanceof ApplicationWindow) {

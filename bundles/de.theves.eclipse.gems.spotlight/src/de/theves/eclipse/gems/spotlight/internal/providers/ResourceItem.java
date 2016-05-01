@@ -27,6 +27,11 @@ public class ResourceItem extends SpotlightItem {
 	}
 
 	@Override
+	public String getDetailsLabel() {
+		return this.resource.getFullPath().toString();
+	}
+
+	@Override
 	public ImageDescriptor doGetImage() {
 		IWorkbenchAdapter adapter = getAdapter(resource);
 		if (null == adapter) {

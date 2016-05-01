@@ -31,6 +31,17 @@ public class CommandItem extends SpotlightItem {
 	}
 
 	@Override
+	public String getDetailsLabel() {
+		try {
+			return this.command.getCommand().getDescription();
+		} catch (NotDefinedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return super.getDetailsLabel();
+	}
+
+	@Override
 	public ImageDescriptor doGetImage() {
 		CommandProvider cp = (CommandProvider) this.provider;
 		ICommandImageService service = cp.getCommandImageService();

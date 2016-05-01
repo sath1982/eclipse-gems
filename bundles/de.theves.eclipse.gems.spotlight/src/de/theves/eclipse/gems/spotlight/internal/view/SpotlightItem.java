@@ -13,11 +13,15 @@ public abstract class SpotlightItem implements Comparable<SpotlightItem> {
 
 	@Override
 	public int compareTo(SpotlightItem o) {
-		return 0;
+		return getLabel().compareTo(o.getLabel());
 	}
 
 	public SpotlightItemProvider getProvider() {
 		return provider;
+	}
+
+	public String getElementName() {
+		return getLabel();
 	}
 
 	public abstract String getLabel();
@@ -34,4 +38,8 @@ public abstract class SpotlightItem implements Comparable<SpotlightItem> {
 	public abstract ImageDescriptor doGetImage();
 
 	public abstract void show();
+
+	public String getDetailsLabel() {
+		return getLabel();
+	}
 }

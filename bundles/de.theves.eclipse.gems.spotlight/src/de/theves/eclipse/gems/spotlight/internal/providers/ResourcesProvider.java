@@ -8,15 +8,17 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ui.model.IWorkbenchAdapter;
 
 import de.theves.eclipse.gems.spotlight.internal.view.SpotlightItem;
 import de.theves.eclipse.gems.spotlight.internal.view.SpotlightItemProvider;
+import de.theves.eclipse.gems.spotlight.internal.view.SpotlightView.SpotlightItemsFilter;
 
 public class ResourcesProvider implements SpotlightItemProvider {
 
 	@Override
-	public List<SpotlightItem> getItems() {
+	public List<SpotlightItem> getItems(SpotlightItemsFilter filter, IProgressMonitor monitor) {
 		List<SpotlightItem> items = new ArrayList<>();
 		try {
 			ResourcesPlugin.getWorkspace().getRoot().accept(new IResourceVisitor() {

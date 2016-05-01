@@ -18,9 +18,17 @@ public class JavaTypeItem extends SpotlightItem {
 
 	@Override
 	public String getLabel() {
-		// TODO differentiate between element name and label (e.g. element name
-		// is Bar but label is foo.Bar)
+		return this.type.getTypeQualifiedName();
+	}
+
+	@Override
+	public String getElementName() {
 		return this.type.getSimpleTypeName();
+	}
+	
+	@Override
+	public String getDetailsLabel() {
+		return this.type.getFullyQualifiedName();
 	}
 
 	@Override

@@ -10,7 +10,6 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.jface.dialogs.IDialogSettings;
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
@@ -31,14 +30,13 @@ public class SpotlightView extends FilteredItemsSelectionDialog {
 	public SpotlightView(IWorkbenchWindow activeWindow, Shell shell, boolean multi) {
 		super(shell, multi);
 		setListLabelProvider(new SpotlightItemLabelProvider());
-		setDetailsLabelProvider(new SpotlightItemLabelProvider());
+		setDetailsLabelProvider(new SpotlightItemDetailsLabelProvider());
 		this.activeWindow = activeWindow;
 	}
 
 	@Override
 	protected Control createExtendedContentArea(Composite parent) {
-		Composite comp = new Composite(parent, SWT.NONE);
-		return comp;
+		return null;
 	}
 
 	@Override
@@ -53,19 +51,7 @@ public class SpotlightView extends FilteredItemsSelectionDialog {
 
 	@Override
 	protected ItemsFilter createFilter() {
-		return new ItemsFilter() {
-
-			@Override
-			public boolean matchItem(Object item) {
-				return matches(((SpotlightItem) item).getLabel());
-			}
-
-			@Override
-			public boolean isConsistentItem(Object item) {
-				// out items are always consistent
-				return true;
-			}
-		};
+		return new SpotlightItemsFilter();
 	}
 
 	@Override
@@ -82,35 +68,49 @@ public class SpotlightView extends FilteredItemsSelectionDialog {
 	protected void fillContentProvider(AbstractContentProvider contentProvider, ItemsFilter itemsFilter,
 			IProgressMonitor progressMonitor) throws CoreException {
 		IProgressMonitor safeMonitor = progressMonitor == null ? new NullProgressMonitor() : progressMonitor;
-		SubProgressMonitor subProgressMonitor = null;
 		try {
 			SpotlightItemProvider[] providers = new SpotlightItemProvider[] { new ViewProvider(),
 					new ResourcesProvider(), new PerspectivesProvider(), new ActionsProvider(this.activeWindow),
 					new CommandProvider(this.activeWindow), new JavaTypesProvider() };
 			safeMonitor.beginTask(null, providers.length);
 			for (int i = 0; i < providers.length; i++) {
-				// add a ruler for each provider
-				contentProvider.add(new Ruler(providers[i].getLabel()), itemsFilter);
-				// add the items
-				List<? extends SpotlightItem> items = providers[i].getItems();
-				for (SpotlightItem searchItem : items) {
-					contentProvider.add(searchItem, itemsFilter);
+				try {
+					// add a ruler for each provider
+					contentProvider.add(new Ruler(providers[i].getLabel()), itemsFilter);
+					// add the items
+					List<? extends SpotlightItem> items = providers[i].getItems((SpotlightItemsFilter) itemsFilter,
+							new SubProgressMonitor(safeMonitor, 1));
+					for (SpotlightItem searchItem : items) {
+						contentProvider.add(searchItem, itemsFilter);
+					}
+				} catch (Exception e) {
+					// catch all exceptions thrown from a provider and go on
+					// TODO logging
+					e.printStackTrace();
 				}
-				safeMonitor.worked(1);
-
 			}
 		} finally {
 			safeMonitor.done();
-			if (subProgressMonitor != null) {
-				subProgressMonitor.done();
-			}
 		}
+	}
+
+	public final class SpotlightItemsFilter extends ItemsFilter {
+
+		@Override
+		public boolean matchItem(Object item) {
+			return matches(((SpotlightItem) item).getElementName());
+		}
+
+		@Override
+		public boolean isConsistentItem(Object item) {
+			// out items are always consistent
+			return true;
+		}
+
 	}
 
 	@Override
 	public String getElementName(Object item) {
-		// TODO differentiate between element name (used to compare items) and
-		// its label (used to display the element)
 		return ((SpotlightItem) item).getLabel();
 	}
 

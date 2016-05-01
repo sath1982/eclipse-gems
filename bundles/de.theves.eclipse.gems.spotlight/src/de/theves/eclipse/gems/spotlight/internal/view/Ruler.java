@@ -28,6 +28,11 @@ public class Ruler extends SpotlightItem {
 	public String getLabel() {
 		return "--------------------------------------" + this.headline + "--------------------------------------";
 	}
+	
+	@Override
+	public String getElementName() {
+		return getLabel();
+	}
 
 	@Override
 	public void show() {
