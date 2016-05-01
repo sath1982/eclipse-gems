@@ -3,9 +3,6 @@ package de.theves.eclipse.gems.spotlight.internal.providers;
 import org.eclipse.jdt.core.search.TypeNameMatch;
 import org.eclipse.jdt.ui.JavaUI;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.jface.viewers.LabelProvider;
-import org.eclipse.ui.ISharedImages;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.model.IWorkbenchAdapter;
 
 import de.theves.eclipse.gems.spotlight.internal.view.SpotlightItem;

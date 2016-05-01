@@ -109,6 +109,8 @@ public class SpotlightView extends FilteredItemsSelectionDialog {
 
 	@Override
 	public String getElementName(Object item) {
+		// TODO differentiate between element name (used to compare items) and
+		// its label (used to display the element)
 		return ((SpotlightItem) item).getLabel();
 	}
 
