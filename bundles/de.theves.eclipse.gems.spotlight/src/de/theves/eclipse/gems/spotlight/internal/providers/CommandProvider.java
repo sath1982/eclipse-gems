@@ -40,7 +40,10 @@ public class CommandProvider implements SpotlightItemProvider {
 					Collection combinations = ParameterizedCommand.generateCombinations(command);
 					for (Iterator it = combinations.iterator(); it.hasNext();) {
 						ParameterizedCommand pc = (ParameterizedCommand) it.next();
-						items.add(new CommandItem(this, pc));
+						if (pc.getCommand().isDefined() && pc.getCommand().isEnabled()) {
+							// only add commands that can be executed
+							items.add(new CommandItem(this, pc));
+						}
 					}
 				} catch (final NotDefinedException e) {
 					// we do not add undefined commands because they are invalid
@@ -53,7 +56,7 @@ public class CommandProvider implements SpotlightItemProvider {
 	public ICommandImageService getCommandImageService() {
 		return this.window.getService(ICommandImageService.class);
 	}
-	
+
 	public IWorkbenchWindow getWindow() {
 		return window;
 	}
