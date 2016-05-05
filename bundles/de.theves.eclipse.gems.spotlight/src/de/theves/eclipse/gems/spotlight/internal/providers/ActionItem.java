@@ -5,27 +5,25 @@ import org.eclipse.jface.resource.ImageDescriptor;
 
 import de.theves.eclipse.gems.spotlight.internal.view.SpotlightItem;
 
-public class ActionItem extends SpotlightItem {
-	private ActionContributionItem action;
+public class ActionItem extends SpotlightItem<ActionContributionItem> {
 
 	public ActionItem(ActionsProvider provider, ActionContributionItem action) {
-		super(provider);
-		this.action = action;
+		super(provider, action);
 	}
 
 	@Override
 	public String getLabel() {
-		return this.action.getAction().getText();
+		return getItem().getAction().getText();
 	}
 
 	@Override
 	public ImageDescriptor doGetImage() {
-		return action.getAction().getImageDescriptor();
+		return getItem().getAction().getImageDescriptor();
 	}
 
 	@Override
 	public void show() {
-		this.action.getAction().run();
+		getItem().getAction().run();
 	}
 
 }

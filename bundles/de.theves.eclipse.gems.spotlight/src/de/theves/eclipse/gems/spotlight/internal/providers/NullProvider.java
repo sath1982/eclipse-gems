@@ -6,7 +6,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 
 import de.theves.eclipse.gems.spotlight.internal.view.SpotlightItem;
 import de.theves.eclipse.gems.spotlight.internal.view.SpotlightItemProvider;
-import de.theves.eclipse.gems.spotlight.internal.view.SpotlightView.SpotlightItemsFilter;
+import de.theves.eclipse.gems.spotlight.internal.view.SpotlightItemsFilter;
 
 public class NullProvider implements SpotlightItemProvider {
 	@Override

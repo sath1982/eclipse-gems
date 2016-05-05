@@ -9,7 +9,7 @@ import org.eclipse.ui.views.IViewDescriptor;
 
 import de.theves.eclipse.gems.spotlight.internal.view.SpotlightItem;
 import de.theves.eclipse.gems.spotlight.internal.view.SpotlightItemProvider;
-import de.theves.eclipse.gems.spotlight.internal.view.SpotlightView.SpotlightItemsFilter;
+import de.theves.eclipse.gems.spotlight.internal.view.SpotlightItemsFilter;
 
 public class ViewProvider implements SpotlightItemProvider {
 

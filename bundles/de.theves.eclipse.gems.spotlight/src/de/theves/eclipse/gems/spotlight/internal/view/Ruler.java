@@ -4,12 +4,12 @@ import org.eclipse.jface.resource.ImageDescriptor;
 
 import de.theves.eclipse.gems.spotlight.internal.providers.NullProvider;
 
-public class Ruler extends SpotlightItem {
+public class Ruler extends SpotlightItem<Object> {
 
 	private String headline;
 
 	public Ruler(String headline) {
-		super(new NullProvider());
+		super(new NullProvider(), new Object());
 		this.headline = headline;
 	}
 
@@ -28,7 +28,7 @@ public class Ruler extends SpotlightItem {
 	public String getLabel() {
 		return "--------------------------------------" + this.headline + "--------------------------------------";
 	}
-	
+
 	@Override
 	public String getElementName() {
 		return getLabel();

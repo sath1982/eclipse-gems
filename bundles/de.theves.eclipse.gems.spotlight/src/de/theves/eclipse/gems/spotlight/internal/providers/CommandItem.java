@@ -13,18 +13,16 @@ import org.eclipse.ui.handlers.IHandlerService;
 
 import de.theves.eclipse.gems.spotlight.internal.view.SpotlightItem;
 
-public class CommandItem extends SpotlightItem {
-	private ParameterizedCommand command;
+public class CommandItem extends SpotlightItem<ParameterizedCommand> {
 
 	public CommandItem(CommandProvider provider, ParameterizedCommand cmd) {
-		super(provider);
-		this.command = cmd;
+		super(provider, cmd);
 	}
 
 	@Override
 	public String getLabel() {
 		try {
-			return this.command.getName();
+			return getItem().getName();
 		} catch (NotDefinedException e) {
 			return null;
 		}
@@ -33,7 +31,7 @@ public class CommandItem extends SpotlightItem {
 	@Override
 	public String getDetailsLabel() {
 		try {
-			return this.command.getCommand().getDescription();
+			return getItem().getCommand().getDescription();
 		} catch (NotDefinedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -45,7 +43,7 @@ public class CommandItem extends SpotlightItem {
 	public ImageDescriptor doGetImage() {
 		CommandProvider cp = (CommandProvider) this.provider;
 		ICommandImageService service = cp.getCommandImageService();
-		ImageDescriptor imageDescriptor = service.getImageDescriptor(this.command.getId());
+		ImageDescriptor imageDescriptor = service.getImageDescriptor(getItem().getId());
 		if (null == imageDescriptor) {
 			// fallback to default command image
 			return PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJ_ELEMENT);
@@ -58,7 +56,7 @@ public class CommandItem extends SpotlightItem {
 		IHandlerService handlerService = PlatformUI.getWorkbench().getService(IHandlerService.class);
 		if (null != handlerService) {
 			try {
-				handlerService.executeCommand(this.command, null);
+				handlerService.executeCommand(getItem(), null);
 			} catch (ExecutionException | NotDefinedException | NotEnabledException | NotHandledException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

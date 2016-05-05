@@ -15,7 +15,7 @@ import org.eclipse.ui.IWorkbenchWindow;
 
 import de.theves.eclipse.gems.spotlight.internal.view.SpotlightItem;
 import de.theves.eclipse.gems.spotlight.internal.view.SpotlightItemProvider;
-import de.theves.eclipse.gems.spotlight.internal.view.SpotlightView.SpotlightItemsFilter;
+import de.theves.eclipse.gems.spotlight.internal.view.SpotlightItemsFilter;
 
 public class ActionsProvider implements SpotlightItemProvider {
 	private IWorkbenchWindow window;

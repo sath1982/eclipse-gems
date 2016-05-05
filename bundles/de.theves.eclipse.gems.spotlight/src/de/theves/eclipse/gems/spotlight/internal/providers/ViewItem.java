@@ -7,28 +7,26 @@ import org.eclipse.ui.views.IViewDescriptor;
 
 import de.theves.eclipse.gems.spotlight.internal.view.SpotlightItem;
 
-public class ViewItem extends SpotlightItem {
-	private IViewDescriptor view;
+public class ViewItem extends SpotlightItem<IViewDescriptor> {
 
 	public ViewItem(ViewProvider provider, IViewDescriptor view) {
-		super(provider);
-		this.view = view;
+		super(provider, view);
 	}
 
 	@Override
 	public String getLabel() {
-		return this.view.getLabel();
+		return getItem().getLabel();
 	}
 
 	@Override
 	public ImageDescriptor doGetImage() {
-		return this.view.getImageDescriptor();
+		return getItem().getImageDescriptor();
 	}
 
 	@Override
 	public void show() {
 		try {
-			PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView(this.view.getId());
+			PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView(getItem().getId());
 		} catch (PartInitException e) {
 			// give up
 			return;

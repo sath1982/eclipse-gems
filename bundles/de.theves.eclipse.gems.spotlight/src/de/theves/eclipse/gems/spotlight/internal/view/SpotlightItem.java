@@ -4,15 +4,21 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 
-public abstract class SpotlightItem implements Comparable<SpotlightItem> {
+public abstract class SpotlightItem<I> implements Comparable<SpotlightItem<I>> {
 	protected SpotlightItemProvider provider;
+	protected I item;
 
-	public SpotlightItem(SpotlightItemProvider provider) {
+	public SpotlightItem(SpotlightItemProvider provider, I item) {
 		this.provider = provider;
+		this.item = item;
+	}
+
+	public I getItem() {
+		return item;
 	}
 
 	@Override
-	public int compareTo(SpotlightItem o) {
+	public int compareTo(SpotlightItem<I> o) {
 		return getLabel().compareTo(o.getLabel());
 	}
 
@@ -41,5 +47,15 @@ public abstract class SpotlightItem implements Comparable<SpotlightItem> {
 
 	public String getDetailsLabel() {
 		return getLabel();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		return getItem().equals(obj);
+	}
+
+	@Override
+	public int hashCode() {
+		return getItem().hashCode();
 	}
 }

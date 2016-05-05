@@ -16,17 +16,23 @@ import org.eclipse.jdt.core.search.TypeNameMatchRequestor;
 
 import de.theves.eclipse.gems.spotlight.internal.view.SpotlightItem;
 import de.theves.eclipse.gems.spotlight.internal.view.SpotlightItemProvider;
-import de.theves.eclipse.gems.spotlight.internal.view.SpotlightView.SpotlightItemsFilter;
+import de.theves.eclipse.gems.spotlight.internal.view.SpotlightItemsFilter;
 
 public class JavaTypesProvider implements SpotlightItemProvider {
 	@Override
-	public List<? extends SpotlightItem> getItems(SpotlightItemsFilter filter, IProgressMonitor monitor) {
+	public List<? extends SpotlightItem<TypeNameMatch>> getItems(SpotlightItemsFilter filter,
+			IProgressMonitor monitor) {
 		List<JavaTypeItem> items = new ArrayList<>();
 		SearchEngine engine = new SearchEngine((WorkingCopyOwner) null);
 		IJavaSearchScope searchScope = SearchEngine.createWorkspaceScope();
 		try {
-			engine.searchAllTypeNames(null, SearchPattern.R_EXACT_MATCH, getSearchPattern(filter),
-					SearchPattern.R_PREFIX_MATCH, IJavaSearchConstants.TYPE, searchScope, new TypeNameMatchRequestor() {
+			engine.searchAllTypeNames(null, SearchPattern.R_EXACT_MATCH, // filter.isCamelCasePattern()
+																			// ?
+																			// SearchPattern.R_CAMELCASE_MATCH
+																			// :
+																			// SearchPattern.R_EXACT_MATCH,
+					getSearchPattern(filter), SearchPattern.R_PREFIX_MATCH, IJavaSearchConstants.TYPE, searchScope,
+					new TypeNameMatchRequestor() {
 						@Override
 						public void acceptTypeNameMatch(TypeNameMatch match) {
 							items.add(new JavaTypeItem(JavaTypesProvider.this, match));
@@ -40,7 +46,7 @@ public class JavaTypesProvider implements SpotlightItemProvider {
 	}
 
 	private char[] getSearchPattern(SpotlightItemsFilter filter) {
-		if (null != filter.getPattern()) {
+		if (null != filter && null != filter.getPattern()) {
 			return filter.getPattern().toCharArray();
 		}
 		return null;

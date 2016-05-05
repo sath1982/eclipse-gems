@@ -16,7 +16,7 @@ import org.eclipse.ui.commands.ICommandService;
 
 import de.theves.eclipse.gems.spotlight.internal.view.SpotlightItem;
 import de.theves.eclipse.gems.spotlight.internal.view.SpotlightItemProvider;
-import de.theves.eclipse.gems.spotlight.internal.view.SpotlightView.SpotlightItemsFilter;
+import de.theves.eclipse.gems.spotlight.internal.view.SpotlightItemsFilter;
 
 public class CommandProvider implements SpotlightItemProvider {
 	private IWorkbenchWindow window;

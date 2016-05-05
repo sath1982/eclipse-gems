@@ -8,34 +8,32 @@ import org.eclipse.ui.model.IWorkbenchAdapter;
 import de.theves.eclipse.gems.spotlight.internal.view.SpotlightItem;
 import de.theves.eclipse.gems.spotlight.internal.view.SpotlightItemProvider;
 
-public class JavaTypeItem extends SpotlightItem {
-	private TypeNameMatch type;
+public class JavaTypeItem extends SpotlightItem<TypeNameMatch> {
 
 	public JavaTypeItem(SpotlightItemProvider provider, TypeNameMatch type) {
-		super(provider);
-		this.type = type;
+		super(provider, type);
 	}
 
 	@Override
 	public String getLabel() {
-		return this.type.getTypeQualifiedName();
+		return getItem().getTypeQualifiedName();
 	}
 
 	@Override
 	public String getElementName() {
-		return this.type.getSimpleTypeName();
+		return getItem().getSimpleTypeName();
 	}
-	
+
 	@Override
 	public String getDetailsLabel() {
-		return this.type.getFullyQualifiedName();
+		return getItem().getFullyQualifiedName();
 	}
 
 	@Override
 	public ImageDescriptor doGetImage() {
-		IWorkbenchAdapter adapter = this.type.getType().getAdapter(IWorkbenchAdapter.class);
+		IWorkbenchAdapter adapter = getItem().getType().getAdapter(IWorkbenchAdapter.class);
 		if (adapter != null) {
-			return adapter.getImageDescriptor(this.type.getType());
+			return adapter.getImageDescriptor(getItem().getType());
 		}
 		return null;
 	}
@@ -43,7 +41,7 @@ public class JavaTypeItem extends SpotlightItem {
 	@Override
 	public void show() {
 		try {
-			JavaUI.openInEditor(this.type.getType());
+			JavaUI.openInEditor(getItem().getType());
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

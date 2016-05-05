@@ -6,28 +6,26 @@ import org.eclipse.ui.PlatformUI;
 
 import de.theves.eclipse.gems.spotlight.internal.view.SpotlightItem;
 
-public class PerspectiveItem extends SpotlightItem {
-	private IPerspectiveDescriptor perspective;
+public class PerspectiveItem extends SpotlightItem<IPerspectiveDescriptor> {
 
 	public PerspectiveItem(PerspectivesProvider provider, IPerspectiveDescriptor perspective) {
-		super(provider);
-		this.perspective = perspective;
+		super(provider, perspective);
 	}
 
 	@Override
 	public String getLabel() {
-		return this.perspective.getLabel();
+		return getItem().getLabel();
 	}
 
 	@Override
 	public ImageDescriptor doGetImage() {
-		return this.perspective.getImageDescriptor();
+		return getItem().getImageDescriptor();
 	}
 
 	@Override
 	public void show() {
 		try {
-			PlatformUI.getWorkbench().showPerspective(this.perspective.getId(),
+			PlatformUI.getWorkbench().showPerspective(getItem().getId(),
 					PlatformUI.getWorkbench().getActiveWorkbenchWindow());
 		} catch (Exception e) {
 			// give up

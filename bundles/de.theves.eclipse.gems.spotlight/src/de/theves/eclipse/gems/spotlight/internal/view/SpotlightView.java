@@ -51,7 +51,20 @@ public class SpotlightView extends FilteredItemsSelectionDialog {
 
 	@Override
 	protected ItemsFilter createFilter() {
-		return new SpotlightItemsFilter();
+		return new ItemsFilter() {
+			@Override
+			public boolean matchItem(Object item) {
+				if (item instanceof SpotlightItem) {
+					return matches(((SpotlightItem) item).getElementName());
+				}
+				return false;
+			}
+
+			@Override
+			public boolean isConsistentItem(Object item) {
+				return true;
+			}
+		};
 	}
 
 	@Override
@@ -73,12 +86,13 @@ public class SpotlightView extends FilteredItemsSelectionDialog {
 					new ResourcesProvider(), new PerspectivesProvider(), new ActionsProvider(this.activeWindow),
 					new CommandProvider(this.activeWindow), new JavaTypesProvider() };
 			safeMonitor.beginTask(null, providers.length);
+			SpotlightItemsFilter theFilter = new SpotlightItemsFilter(itemsFilter.getPattern());
 			for (int i = 0; i < providers.length; i++) {
 				try {
 					// add a ruler for each provider
 					contentProvider.add(new Ruler(providers[i].getLabel()), itemsFilter);
 					// add the items
-					List<? extends SpotlightItem> items = providers[i].getItems((SpotlightItemsFilter) itemsFilter,
+					List<? extends SpotlightItem> items = providers[i].getItems(theFilter,
 							new SubProgressMonitor(safeMonitor, 1));
 					for (SpotlightItem searchItem : items) {
 						contentProvider.add(searchItem, itemsFilter);
@@ -92,21 +106,6 @@ public class SpotlightView extends FilteredItemsSelectionDialog {
 		} finally {
 			safeMonitor.done();
 		}
-	}
-
-	public final class SpotlightItemsFilter extends ItemsFilter {
-
-		@Override
-		public boolean matchItem(Object item) {
-			return matches(((SpotlightItem) item).getElementName());
-		}
-
-		@Override
-		public boolean isConsistentItem(Object item) {
-			// out items are always consistent
-			return true;
-		}
-
 	}
 
 	@Override
