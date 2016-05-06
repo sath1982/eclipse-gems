@@ -18,7 +18,7 @@ import de.theves.eclipse.gems.spotlight.internal.view.SpotlightItem;
 import de.theves.eclipse.gems.spotlight.internal.view.SpotlightItemProvider;
 import de.theves.eclipse.gems.spotlight.internal.view.SpotlightItemsFilter;
 
-public class CommandProvider implements SpotlightItemProvider {
+public class CommandProvider implements SpotlightItemProvider<ParameterizedCommand> {
 	private IWorkbenchWindow window;
 
 	public CommandProvider(IWorkbenchWindow window) {
@@ -27,8 +27,8 @@ public class CommandProvider implements SpotlightItemProvider {
 
 	@SuppressWarnings("rawtypes")
 	@Override
-	public List<SpotlightItem> getItems(SpotlightItemsFilter filter, IProgressMonitor monitor) {
-		List<SpotlightItem> items = new ArrayList<>();
+	public List<SpotlightItem<ParameterizedCommand>> getItems(SpotlightItemsFilter filter, IProgressMonitor monitor) {
+		List<SpotlightItem<ParameterizedCommand>> items = new ArrayList<>();
 		ICommandService commandService = PlatformUI.getWorkbench().getService(ICommandService.class);
 		final Collection commandIds = commandService.getDefinedCommandIds();
 		final Iterator commandIdItr = commandIds.iterator();

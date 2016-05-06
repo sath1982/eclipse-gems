@@ -8,9 +8,9 @@ import de.theves.eclipse.gems.spotlight.internal.view.SpotlightItem;
 import de.theves.eclipse.gems.spotlight.internal.view.SpotlightItemProvider;
 import de.theves.eclipse.gems.spotlight.internal.view.SpotlightItemsFilter;
 
-public class NullProvider implements SpotlightItemProvider {
+public class NullProvider implements SpotlightItemProvider<Object> {
 	@Override
-	public List<SpotlightItem> getItems(SpotlightItemsFilter filter, IProgressMonitor monitor) {
+	public List<SpotlightItem<Object>> getItems(SpotlightItemsFilter filter, IProgressMonitor monitor) {
 		// what a suprise ;-)
 		return null;
 	}

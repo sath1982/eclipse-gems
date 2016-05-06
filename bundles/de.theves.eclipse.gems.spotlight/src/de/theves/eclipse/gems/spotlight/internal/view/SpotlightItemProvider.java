@@ -4,8 +4,8 @@ import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 
-public interface SpotlightItemProvider {
-	List<? extends SpotlightItem> getItems(SpotlightItemsFilter filter, IProgressMonitor monitor);
+public interface SpotlightItemProvider<T> {
+	List<SpotlightItem<T>> getItems(SpotlightItemsFilter filter, IProgressMonitor monitor);
 
 	String getLabel();
 }

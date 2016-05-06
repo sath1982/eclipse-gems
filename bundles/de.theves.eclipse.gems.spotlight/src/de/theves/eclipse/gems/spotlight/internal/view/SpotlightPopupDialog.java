@@ -4,17 +4,24 @@ import org.eclipse.jface.dialogs.PopupDialog;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.jface.resource.ResourceManager;
-import org.eclipse.jface.viewers.AbstractTreeViewer;
-import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.jface.viewers.CellLabelProvider;
+import org.eclipse.jface.viewers.ColumnLabelProvider;
+import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.jface.viewers.TableViewerColumn;
+import org.eclipse.jface.viewers.TreePath;
+import org.eclipse.jface.viewers.ViewerCell;
+import org.eclipse.jface.viewers.ViewerRow;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.swt.widgets.Tree;
+import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.IWorkbenchWindow;
 
 import de.theves.eclipse.gems.spotlight.internal.providers.ActionsProvider;
@@ -25,14 +32,16 @@ import de.theves.eclipse.gems.spotlight.internal.providers.ResourcesProvider;
 import de.theves.eclipse.gems.spotlight.internal.providers.ViewProvider;
 
 public class SpotlightPopupDialog extends PopupDialog {
+	public static final int COL_PROVIDER = 0;
+	public static final int COL_ITEMS = 1;
 
 	private Composite composite;
 	private ResourceManager resourceManager;
-	private TreeViewer treeViewer;
 	private IWorkbenchWindow window;
 	private SpotlightItemsFilter filter;
 	private SpotlightItemViewerFilter viewerFilter;
-	private SpotlightItemTreeContentProvider contentProvider;
+	private TableViewer tableViewer;
+	private SpotlightItemContentProvider contentProvider;
 
 	public SpotlightPopupDialog(Shell parent, IWorkbenchWindow window) {
 		super(parent, SWT.NONE, true, true, true, false, false, null, null);
@@ -55,38 +64,49 @@ public class SpotlightPopupDialog extends PopupDialog {
 			}
 
 			private void updateViewer(final Text text) {
-				treeViewer.getTree().setRedraw(false);
+				tableViewer.getTable().setRedraw(false);
 				filter = new SpotlightItemsFilter(text.getText());
 				viewerFilter.setFilter(filter);
 				contentProvider.setFilter(filter);
-				treeViewer.refresh();
-				treeViewer.expandAll();
-				treeViewer.getTree().setRedraw(true);
+				tableViewer.refresh();
+				tableViewer.getTable().setRedraw(true);
 			}
 		});
+		this.filter = new SpotlightItemsFilter(text.getText());
+		this.viewerFilter = new SpotlightItemViewerFilter(filter);
 
-		Tree tree = new Tree(this.composite, SWT.V_SCROLL | SWT.H_SCROLL | SWT.BORDER);
-		GridData data = new GridData(GridData.FILL_BOTH);
-		data.heightHint = tree.getItemHeight() * 12;
-		tree.setLayoutData(data);
+		tableViewer = new TableViewer(this.composite, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
+		tableViewer.getControl().setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, true));
 
-		treeViewer = new TreeViewer(tree);
-		contentProvider = new SpotlightItemTreeContentProvider(filter);
-		treeViewer.setContentProvider(contentProvider);
-		treeViewer.setLabelProvider(new SpotlightItemDetailsLabelProvider());
-		filter = new SpotlightItemsFilter(text.getText());
-		viewerFilter = new SpotlightItemViewerFilter(filter);
-		treeViewer.addFilter(viewerFilter);
+		contentProvider = new SpotlightItemContentProvider(filter);
+		tableViewer.setContentProvider(contentProvider);
+		tableViewer.addFilter(viewerFilter);
 
-		treeViewer.setAutoExpandLevel(AbstractTreeViewer.ALL_LEVELS);
-		treeViewer.setUseHashlookup(true);
+		TableViewerColumn providerCol = new TableViewerColumn(tableViewer, SWT.NONE);
+		providerCol.getColumn().setWidth(200);
+		providerCol.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(ViewerCell cell) {
+				SpotlightItem item = (SpotlightItem) cell.getElement();
+				cell.setText(item.getProvider().getLabel());
+			}
+		});
+		TableViewerColumn itemsCol = new TableViewerColumn(tableViewer, SWT.NONE);
+		itemsCol.getColumn().setWidth(200);
+		itemsCol.setLabelProvider(new CellLabelProvider() {
+
+			@Override
+			public void update(ViewerCell cell) {
+				SpotlightItem item = (SpotlightItem) cell.getElement();
+				cell.setText(item.getDetailsLabel());
+				cell.setImage((Image) getResourceManager().get(item.getImage()));
+			}
+		});
 
 		SpotlightItemProvider[] providers = new SpotlightItemProvider[] { new ViewProvider(), new ResourcesProvider(),
 				new PerspectivesProvider(), new ActionsProvider(this.window), new CommandProvider(this.window),
 				new JavaTypesProvider() };
-		// SpotlightItemProvider[] providers = new SpotlightItemProvider[] { new
-		// ResourcesProvider() };
-		treeViewer.setInput(new SpotlightDialogInput(providers));
+		tableViewer.setInput(new SpotlightDialogInput(providers));
 
 		this.composite.pack();
 
@@ -106,6 +126,10 @@ public class SpotlightPopupDialog extends PopupDialog {
 			resourceManager = new LocalResourceManager(JFaceResources.getResources());
 		}
 		return resourceManager;
+	}
+
+	public SpotlightItem<Object> getSelectedElement() {
+		return (SpotlightItem<Object>) tableViewer.getStructuredSelection().getFirstElement();
 	}
 
 }

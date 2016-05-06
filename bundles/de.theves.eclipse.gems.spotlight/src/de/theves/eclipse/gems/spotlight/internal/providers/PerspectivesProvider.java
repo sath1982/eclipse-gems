@@ -11,7 +11,7 @@ import de.theves.eclipse.gems.spotlight.internal.view.SpotlightItem;
 import de.theves.eclipse.gems.spotlight.internal.view.SpotlightItemProvider;
 import de.theves.eclipse.gems.spotlight.internal.view.SpotlightItemsFilter;
 
-public class PerspectivesProvider implements SpotlightItemProvider {
+public class PerspectivesProvider implements SpotlightItemProvider<IPerspectiveDescriptor> {
 
 	@Override
 	public List<SpotlightItem<IPerspectiveDescriptor>> getItems(SpotlightItemsFilter filter, IProgressMonitor monitor) {
