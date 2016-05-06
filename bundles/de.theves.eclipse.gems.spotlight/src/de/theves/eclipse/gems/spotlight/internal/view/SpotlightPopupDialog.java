@@ -86,7 +86,8 @@ public class SpotlightPopupDialog extends PopupDialog {
 			@Override
 			public void update(ViewerCell cell) {
 				SpotlightItem item = (SpotlightItem) cell.getElement();
-				cell.setText(item.getProvider().getLabel());
+				cell.setText(item.getLabel());
+				cell.setImage((Image) getResourceManager().get(item.getImage()));
 			}
 		});
 		TableViewerColumn itemsCol = new TableViewerColumn(tableViewer, SWT.NONE);
@@ -97,7 +98,7 @@ public class SpotlightPopupDialog extends PopupDialog {
 			public void update(ViewerCell cell) {
 				SpotlightItem item = (SpotlightItem) cell.getElement();
 				cell.setText(item.getDetailsLabel());
-				cell.setImage((Image) getResourceManager().get(item.getImage()));
+
 			}
 		});
 
