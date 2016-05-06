@@ -1,5 +1,9 @@
 package de.theves.eclipse.gems.spotlight.internal.view;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.PopupDialog;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
@@ -23,6 +27,7 @@ import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.progress.UIJob;
 
 import de.theves.eclipse.gems.spotlight.internal.providers.ActionsProvider;
 import de.theves.eclipse.gems.spotlight.internal.providers.CommandProvider;
@@ -42,6 +47,8 @@ public class SpotlightPopupDialog extends PopupDialog {
 	private SpotlightItemViewerFilter viewerFilter;
 	private TableViewer tableViewer;
 	private SpotlightItemContentProvider contentProvider;
+	private Text text;
+	private UpdateJob job;
 
 	public SpotlightPopupDialog(Shell parent, IWorkbenchWindow window) {
 		super(parent, SWT.NONE, true, true, true, false, false, null, null);
@@ -52,7 +59,7 @@ public class SpotlightPopupDialog extends PopupDialog {
 	protected Control createDialogArea(Composite parent) {
 		this.composite = (Composite) super.createDialogArea(parent);
 
-		final Text text = new Text(this.composite, SWT.SINGLE | SWT.BORDER | SWT.SEARCH | SWT.ICON_CANCEL);
+		text = new Text(this.composite, SWT.SINGLE | SWT.BORDER | SWT.SEARCH | SWT.ICON_CANCEL);
 		text.setMessage("Spotlight Search");
 		GridData gridData = new GridData(GridData.FILL_BOTH);
 		gridData.widthHint = 500;
@@ -61,15 +68,6 @@ public class SpotlightPopupDialog extends PopupDialog {
 			@Override
 			public void modifyText(ModifyEvent e) {
 				updateViewer(text);
-			}
-
-			private void updateViewer(final Text text) {
-				tableViewer.getTable().setRedraw(false);
-				filter = new SpotlightItemsFilter(text.getText());
-				viewerFilter.setFilter(filter);
-				contentProvider.setFilter(filter);
-				tableViewer.refresh();
-				tableViewer.getTable().setRedraw(true);
 			}
 		});
 		this.filter = new SpotlightItemsFilter(text.getText());
@@ -111,6 +109,36 @@ public class SpotlightPopupDialog extends PopupDialog {
 		this.composite.pack();
 
 		return composite;
+	}
+
+	private void updateViewer(final Text text) {
+		if (job != null) {
+			job.cancel();
+		}
+		job = new UpdateJob();
+		job.setSystem(true);
+		job.schedule();
+
+	}
+
+	private class UpdateJob extends UIJob {
+
+		public UpdateJob() {
+			super("Spotlight-Search");
+		}
+
+		@Override
+		public IStatus runInUIThread(IProgressMonitor monitor) {
+			tableViewer.getTable().setRedraw(false);
+			filter = new SpotlightItemsFilter(text.getText());
+			viewerFilter.setFilter(filter);
+			contentProvider.setFilter(filter);
+			contentProvider.setMonitor(monitor);
+			tableViewer.refresh();
+			tableViewer.getTable().setRedraw(true);
+			return Status.OK_STATUS;
+		}
+
 	}
 
 	@Override
