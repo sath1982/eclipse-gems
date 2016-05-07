@@ -12,7 +12,7 @@ public class SpotlightItemsFilter {
 	public SpotlightItemsFilter(SearchPattern searchPattern, String pattern) {
 		patternMatcher = searchPattern;
 		String stringPattern = ""; //$NON-NLS-1$
-		if (pattern != null && !pattern.equals("*")) { //$NON-NLS-1$
+		if (pattern != null && !pattern.equals("*") && !pattern.isEmpty()) { //$NON-NLS-1$
 			stringPattern = pattern;
 		}
 		patternMatcher.setPattern(stringPattern);
