@@ -14,9 +14,14 @@ import de.theves.eclipse.gems.spotlight.internal.view.SpotlightItemsFilter;
 public class ViewProvider implements SpotlightItemProvider {
 
 	@Override
-	public List<SpotlightItem> getItems(SpotlightItemsFilter filter, IProgressMonitor monitor) {
+	public int getCategory() {
+		return CATEGORY_VIEWS;
+	}
+
+	@Override
+	public List<SpotlightItem<?>> getItems(SpotlightItemsFilter filter, IProgressMonitor monitor) {
 		IViewDescriptor[] views = PlatformUI.getWorkbench().getViewRegistry().getViews();
-		List<SpotlightItem> items = new ArrayList<>();
+		List<SpotlightItem<?>> items = new ArrayList<>();
 		for (IViewDescriptor view : views) {
 			items.add(new ViewItem(this, view));
 		}

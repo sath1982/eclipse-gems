@@ -10,7 +10,7 @@ import de.theves.eclipse.gems.spotlight.internal.view.SpotlightItemProvider;
 
 public class JavaTypeItem extends SpotlightItem<TypeNameMatch> {
 
-	public JavaTypeItem(SpotlightItemProvider<TypeNameMatch> provider, TypeNameMatch type) {
+	public JavaTypeItem(SpotlightItemProvider provider, TypeNameMatch type) {
 		super(provider, type);
 	}
 

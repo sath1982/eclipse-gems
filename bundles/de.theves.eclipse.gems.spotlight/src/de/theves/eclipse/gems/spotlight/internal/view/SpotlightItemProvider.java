@@ -4,8 +4,17 @@ import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 
-public interface SpotlightItemProvider<T> {
-	List<SpotlightItem<T>> getItems(SpotlightItemsFilter filter, IProgressMonitor monitor);
+public interface SpotlightItemProvider {
+	int CATEGORY_JAVA_TYPES = 0;
+	int CATEGORY_RESOURCES = 1;
+	int CATEGORY_COMMANDS = 2;
+	int CATEGORY_ACTIONS = 3;
+	int CATEGORY_VIEWS = 4;
+	int CATEGORY_PERSPECTIVES = 5;
+	
+	List<SpotlightItem<?>> getItems(SpotlightItemsFilter filter, IProgressMonitor monitor);
 
 	String getLabel();
+	
+	int getCategory();
 }

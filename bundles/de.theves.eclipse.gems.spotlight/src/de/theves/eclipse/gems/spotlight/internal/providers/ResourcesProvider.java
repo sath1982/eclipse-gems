@@ -15,11 +15,16 @@ import de.theves.eclipse.gems.spotlight.internal.view.SpotlightItem;
 import de.theves.eclipse.gems.spotlight.internal.view.SpotlightItemProvider;
 import de.theves.eclipse.gems.spotlight.internal.view.SpotlightItemsFilter;
 
-public class ResourcesProvider implements SpotlightItemProvider<IFile> {
+public class ResourcesProvider implements SpotlightItemProvider {
 
 	@Override
-	public List<SpotlightItem<IFile>> getItems(SpotlightItemsFilter filter, IProgressMonitor monitor) {
-		List<SpotlightItem<IFile>> items = new ArrayList<>();
+	public int getCategory() {
+		return CATEGORY_RESOURCES;
+	}
+
+	@Override
+	public List<SpotlightItem<?>> getItems(SpotlightItemsFilter filter, IProgressMonitor monitor) {
+		List<SpotlightItem<?>> items = new ArrayList<>();
 		try {
 			ResourcesPlugin.getWorkspace().getRoot().accept(new IResourceVisitor() {
 				@Override

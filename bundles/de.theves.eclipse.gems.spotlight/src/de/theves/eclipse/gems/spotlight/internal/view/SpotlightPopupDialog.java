@@ -17,7 +17,9 @@ import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
+import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
+import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
@@ -72,7 +74,79 @@ public class SpotlightPopupDialog extends PopupDialog {
 	protected Control createDialogArea(Composite parent) {
 		this.composite = (Composite) super.createDialogArea(parent);
 
-		text = new Text(this.composite, SWT.SINGLE | SWT.BORDER | SWT.SEARCH | SWT.ICON_CANCEL);
+		createSearchField();
+
+		this.filter = new SpotlightItemsFilter(text.getText());
+		this.viewerFilter = new SpotlightItemViewerFilter(filter);
+		tableViewer = new TableViewer(this.composite, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
+		tableViewer.getControl().setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, true));
+		tableViewer.setContentProvider(ArrayContentProvider.getInstance());
+		tableViewer.addFilter(viewerFilter);
+
+		tableViewer.setComparator(new ViewerComparator() {
+			@Override
+			public int category(Object element) {
+				return ((SpotlightItem<?>) element).getProvider().getCategory();
+			}
+
+			@Override
+			public int compare(Viewer viewer, Object e1, Object e2) {
+				int cat1 = category(e1);
+				int cat2 = category(e2);
+
+				if (cat1 != cat2) {
+					return cat1 - cat2;
+				}
+
+				SpotlightItem<?> i1 = (SpotlightItem<?>) e1;
+				SpotlightItem<?> i2 = (SpotlightItem<?>) e2;
+				return i1.compareTo(i2);
+			}
+		});
+
+		createColumns();
+
+		tableViewer.getTable().addKeyListener(new KeyListener() {
+
+			@Override
+			public void keyReleased(KeyEvent e) {
+				// not used
+			}
+
+			@Override
+			public void keyPressed(KeyEvent e) {
+				if (e.keyCode == SWT.CR) {
+					closeAndShow();
+				}
+			}
+		});
+		tableViewer.getTable().addMouseListener(new MouseListener() {
+			@Override
+			public void mouseUp(MouseEvent e) {
+				// not used
+			}
+
+			@Override
+			public void mouseDown(MouseEvent e) {
+				// not used
+			}
+
+			@Override
+			public void mouseDoubleClick(MouseEvent e) {
+				closeAndShow();
+			}
+		});
+
+		tableViewer.setUseHashlookup(true);
+		tableViewer.setInput(EMPTY_ARRAY);
+
+		this.composite.pack();
+
+		return composite;
+	}
+
+	private void createSearchField() {
+		text = new Text(this.composite, SWT.SINGLE | SWT.SEARCH);
 		text.setMessage("Spotlight Search");
 		GridData gridData = new GridData(GridData.FILL_BOTH);
 		gridData.widthHint = 500;
@@ -101,57 +175,6 @@ public class SpotlightPopupDialog extends PopupDialog {
 				}
 			}
 		});
-
-		this.filter = new SpotlightItemsFilter(text.getText());
-		this.viewerFilter = new SpotlightItemViewerFilter(filter);
-
-		tableViewer = new TableViewer(this.composite, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
-		tableViewer.getControl().setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, true));
-
-		tableViewer.setContentProvider(ArrayContentProvider.getInstance());
-		tableViewer.addFilter(viewerFilter);
-
-		createColumns();
-
-		tableViewer.getTable().addKeyListener(new KeyListener() {
-
-			@Override
-			public void keyReleased(KeyEvent e) {
-				// not used
-			}
-
-			@Override
-			public void keyPressed(KeyEvent e) {
-				if (e.keyCode == SWT.CR) {
-					closeAndShow();
-				}
-			}
-		});
-
-		tableViewer.getTable().addMouseListener(new MouseListener() {
-
-			@Override
-			public void mouseUp(MouseEvent e) {
-				// not used
-			}
-
-			@Override
-			public void mouseDown(MouseEvent e) {
-				// not used
-			}
-
-			@Override
-			public void mouseDoubleClick(MouseEvent e) {
-				closeAndShow();
-			}
-		});
-
-		tableViewer.setUseHashlookup(true);
-		tableViewer.setInput(EMPTY_ARRAY);
-
-		this.composite.pack();
-
-		return composite;
 	}
 
 	private void closeAndShow() {
@@ -174,8 +197,7 @@ public class SpotlightPopupDialog extends PopupDialog {
 			@Override
 			public void update(ViewerCell cell) {
 				SpotlightItem<?> item = (SpotlightItem<?>) cell.getElement();
-				cell.setText(item.getLabel());
-				cell.setImage((Image) getResourceManager().get(item.getImage()));
+				cell.setText(item.getProvider().getLabel());
 			}
 		});
 		TableViewerColumn itemsCol = new TableViewerColumn(tableViewer, SWT.NONE);
@@ -185,8 +207,8 @@ public class SpotlightPopupDialog extends PopupDialog {
 			@Override
 			public void update(ViewerCell cell) {
 				SpotlightItem<?> item = (SpotlightItem<?>) cell.getElement();
-				cell.setText(item.getDetailsLabel());
-
+				cell.setText(item.getLabel());
+				cell.setImage((Image) getResourceManager().get(item.getImage()));
 			}
 		});
 	}
@@ -236,12 +258,13 @@ public class SpotlightPopupDialog extends PopupDialog {
 		return super.close();
 	}
 
-	public SpotlightItem<?>[] listItems(IProgressMonitor monitor) {
+	private SpotlightItem<?>[] listItems(IProgressMonitor monitor) {
 		monitor.beginTask(null, providers.length);
-		List<SpotlightItem<?>> result = new ArrayList<>();
 		try {
+			List<SpotlightItem<?>> result = new ArrayList<>();
 			for (SpotlightItemProvider provider : providers) {
-				result.addAll(provider.getItems(this.filter, new SubProgressMonitor(monitor, 1)));
+				List<SpotlightItem<?>> items = provider.getItems(this.filter, new SubProgressMonitor(monitor, 1));
+				result.addAll(items);
 			}
 			return result.toArray(new SpotlightItem[result.size()]);
 		} finally {
@@ -257,7 +280,7 @@ public class SpotlightPopupDialog extends PopupDialog {
 	}
 
 	public SpotlightItem<?> getSelectedElement() {
-		return (SpotlightItem<Object>) tableViewer.getStructuredSelection().getFirstElement();
+		return (SpotlightItem<?>) tableViewer.getStructuredSelection().getFirstElement();
 	}
 
 }

@@ -18,7 +18,7 @@ public class SpotlightItemsFilter {
 		patternMatcher.setPattern(stringPattern);
 	}
 
-	public boolean matchesRawNamePattern(SpotlightItem item) {
+	public boolean matchesRawNamePattern(SpotlightItem<?> item) {
 		String prefix = patternMatcher.getPattern();
 		String text = item.getElementName();
 

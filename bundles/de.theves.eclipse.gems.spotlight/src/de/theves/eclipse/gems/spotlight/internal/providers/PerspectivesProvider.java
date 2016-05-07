@@ -11,12 +11,17 @@ import de.theves.eclipse.gems.spotlight.internal.view.SpotlightItem;
 import de.theves.eclipse.gems.spotlight.internal.view.SpotlightItemProvider;
 import de.theves.eclipse.gems.spotlight.internal.view.SpotlightItemsFilter;
 
-public class PerspectivesProvider implements SpotlightItemProvider<IPerspectiveDescriptor> {
+public class PerspectivesProvider implements SpotlightItemProvider {
 
 	@Override
-	public List<SpotlightItem<IPerspectiveDescriptor>> getItems(SpotlightItemsFilter filter, IProgressMonitor monitor) {
+	public int getCategory() {
+		return CATEGORY_PERSPECTIVES;
+	}
+
+	@Override
+	public List<SpotlightItem<?>> getItems(SpotlightItemsFilter filter, IProgressMonitor monitor) {
 		IPerspectiveDescriptor[] perspectives = PlatformUI.getWorkbench().getPerspectiveRegistry().getPerspectives();
-		List<SpotlightItem<IPerspectiveDescriptor>> items = new ArrayList<>();
+		List<SpotlightItem<?>> items = new ArrayList<>();
 		for (IPerspectiveDescriptor perspective : perspectives) {
 			items.add(new PerspectiveItem(this, perspective));
 		}

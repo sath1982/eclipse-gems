@@ -17,7 +17,7 @@ import de.theves.eclipse.gems.spotlight.internal.view.SpotlightItem;
 import de.theves.eclipse.gems.spotlight.internal.view.SpotlightItemProvider;
 import de.theves.eclipse.gems.spotlight.internal.view.SpotlightItemsFilter;
 
-public class ActionsProvider implements SpotlightItemProvider<ActionContributionItem> {
+public class ActionsProvider implements SpotlightItemProvider {
 	private IWorkbenchWindow window;
 
 	public ActionsProvider(IWorkbenchWindow window) {
@@ -25,8 +25,8 @@ public class ActionsProvider implements SpotlightItemProvider<ActionContribution
 	}
 
 	@Override
-	public List<SpotlightItem<ActionContributionItem>> getItems(SpotlightItemsFilter filter, IProgressMonitor monitor) {
-		List<SpotlightItem<ActionContributionItem>> items = new ArrayList<>();
+	public List<SpotlightItem<?>> getItems(SpotlightItemsFilter filter, IProgressMonitor monitor) {
+		List<SpotlightItem<?>> items = new ArrayList<>();
 		IWorkbenchWindow window = this.window;
 		if (window instanceof ApplicationWindow) {
 			MenuManager menu = ((ApplicationWindow) window).getMenuBarManager();
@@ -37,6 +37,11 @@ public class ActionsProvider implements SpotlightItemProvider<ActionContribution
 			}
 		}
 		return items;
+	}
+	
+	@Override
+	public int getCategory() {
+		return CATEGORY_ACTIONS;
 	}
 
 	private void collectContributions(MenuManager menu, Set<ActionContributionItem> result) {

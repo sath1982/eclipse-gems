@@ -17,7 +17,7 @@ public class SpotlightItemViewerFilter extends ViewerFilter {
 	@Override
 	public boolean select(Viewer viewer, Object parentElement, Object element) {
 		if (element instanceof SpotlightItem) {
-			return filter.matches(((SpotlightItem) element).getElementName());
+			return filter.matches(((SpotlightItem<?>) element).getElementName());
 		}
 		if (element instanceof SpotlightItemProvider) {
 			// no filtering for providers

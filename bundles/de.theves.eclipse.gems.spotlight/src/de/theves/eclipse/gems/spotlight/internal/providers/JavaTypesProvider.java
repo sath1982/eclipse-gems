@@ -18,15 +18,21 @@ import de.theves.eclipse.gems.spotlight.internal.view.SpotlightItem;
 import de.theves.eclipse.gems.spotlight.internal.view.SpotlightItemProvider;
 import de.theves.eclipse.gems.spotlight.internal.view.SpotlightItemsFilter;
 
-public class JavaTypesProvider implements SpotlightItemProvider<TypeNameMatch> {
+public class JavaTypesProvider implements SpotlightItemProvider {
+
 	@Override
-	public List<SpotlightItem<TypeNameMatch>> getItems(SpotlightItemsFilter filter, IProgressMonitor monitor) {
-		List<SpotlightItem<TypeNameMatch>> items = new ArrayList<>();
+	public int getCategory() {
+		return CATEGORY_JAVA_TYPES;
+	}
+
+	@Override
+	public List<SpotlightItem<?>> getItems(SpotlightItemsFilter filter, IProgressMonitor monitor) {
+		List<SpotlightItem<?>> items = new ArrayList<>();
 		SearchEngine engine = new SearchEngine((WorkingCopyOwner) null);
 		IJavaSearchScope searchScope = SearchEngine.createWorkspaceScope();
 		try {
-			engine.searchAllTypeNames(null,  filter.isCamelCasePattern()
-					? SearchPattern.R_CAMELCASE_MATCH : SearchPattern.R_EXACT_MATCH,
+			engine.searchAllTypeNames(null,
+					filter.isCamelCasePattern() ? SearchPattern.R_CAMELCASE_MATCH : SearchPattern.R_EXACT_MATCH,
 					getSearchPattern(filter), SearchPattern.R_PREFIX_MATCH, IJavaSearchConstants.TYPE, searchScope,
 					new TypeNameMatchRequestor() {
 						@Override
