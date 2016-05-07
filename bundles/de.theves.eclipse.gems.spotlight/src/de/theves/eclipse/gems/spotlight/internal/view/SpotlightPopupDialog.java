@@ -8,6 +8,9 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubProgressMonitor;
+import org.eclipse.core.runtime.jobs.IJobChangeEvent;
+import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.jface.dialogs.PopupDialog;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
@@ -31,6 +34,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -58,12 +62,14 @@ public class SpotlightPopupDialog extends PopupDialog {
 	private SpotlightItemViewerFilter viewerFilter;
 	private TableViewer tableViewer;
 	private Text text;
-	private UpdateJob job;
+	private SearchItemsJob job;
+	private ProgressBar progressbar;
+	protected UpdateUIJob uiJob;
 
 	public SpotlightPopupDialog(Shell parent, IWorkbenchWindow window) {
 		super(parent, SWT.RESIZE, true, true, true, false, false, null, null);
 		this.window = window;
-		this.job = new UpdateJob();
+		this.job = new SearchItemsJob();
 		this.job.setSystem(true);
 		providers = new SpotlightItemProvider[] { new ViewProvider(), new ResourcesProvider(),
 				new PerspectivesProvider(), new ActionsProvider(this.window), new CommandProvider(this.window),
@@ -75,6 +81,9 @@ public class SpotlightPopupDialog extends PopupDialog {
 		this.composite = (Composite) super.createDialogArea(parent);
 
 		createSearchField();
+
+		progressbar = new ProgressBar(this.composite, SWT.SMOOTH);
+		progressbar.setLayoutData(new GridData(SWT.FILL, SWT.NONE, true, false));
 
 		this.filter = new SpotlightItemsFilter(text.getText());
 		this.viewerFilter = new SpotlightItemViewerFilter(filter);
@@ -214,38 +223,79 @@ public class SpotlightPopupDialog extends PopupDialog {
 	}
 
 	private void updateViewer(final Text text) {
-		job.cancel();
+		if (text.getText() == null || text.getText().isEmpty()) {
+			tableViewer.setInput(EMPTY_ARRAY);
+			progressbar.setSelection(0);
+			return;
+		}
+		filter = new SpotlightItemsFilter(text.getText());
+		viewerFilter.setFilter(filter);
+
+		if (job != null) {
+			job.cancel();
+		}
+		job = new SearchItemsJob();
+		job.addJobChangeListener(new JobChangeAdapter() {
+			@Override
+			public void done(IJobChangeEvent event) {
+				if (uiJob != null) {
+					uiJob.cancel();
+				}
+				uiJob = new UpdateUIJob(job.getItems());
+				uiJob.schedule();
+			}
+		});
 		job.schedule();
+
 	}
 
-	private class UpdateJob extends UIJob {
+	private class UpdateUIJob extends UIJob {
+		private SpotlightItem[] items;
 
-		public UpdateJob() {
-			super("Spotlight-Search");
+		public UpdateUIJob(SpotlightItem[] items) {
+			super("Spotlight Update");
+			setSystem(true);
+			this.items = items;
 		}
 
 		@Override
 		public IStatus runInUIThread(IProgressMonitor monitor) {
 			IProgressMonitor pm = monitor != null ? monitor : new NullProgressMonitor();
-
 			try {
 				pm.beginTask(null, 3);
-				if (text.getText() != null && !text.getText().isEmpty()) {
-					tableViewer.getTable().setRedraw(false);
-					filter = new SpotlightItemsFilter(text.getText());
-					viewerFilter.setFilter(filter);
-					SpotlightItem<?>[] items = listItems(new SubProgressMonitor(pm, 2));
-					tableViewer.setInput(items);
-					tableViewer.getTable().setRedraw(true);
-				} else {
-					tableViewer.setInput(EMPTY_ARRAY);
-					pm.worked(2);
-				}
+				progressbar.setSelection(0);
+				tableViewer.getTable().setRedraw(false);
+				progressbar.setSelection(33);
+				progressbar.setSelection(66);
+				tableViewer.setInput(this.items);
+				tableViewer.getTable().setRedraw(true);
 				pm.worked(1);
+				progressbar.setSelection(100);
 				return Status.OK_STATUS;
 			} finally {
 				pm.done();
 			}
+		}
+
+	}
+
+	private class SearchItemsJob extends Job {
+
+		private SpotlightItem<?>[] items;
+
+		public SearchItemsJob() {
+			super("Spotlight-Search");
+			setSystem(true);
+		}
+
+		@Override
+		protected IStatus run(IProgressMonitor monitor) {
+			items = listItems(monitor);
+			return Status.OK_STATUS;
+		}
+
+		public SpotlightItem<?>[] getItems() {
+			return items;
 		}
 
 	}
@@ -255,6 +305,8 @@ public class SpotlightPopupDialog extends PopupDialog {
 		if (resourceManager != null) {
 			resourceManager.dispose();
 		}
+		uiJob = null;
+		job = null;
 		return super.close();
 	}
 
