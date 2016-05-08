@@ -33,29 +33,36 @@ public class CommandProvider implements SpotlightItemProvider {
 	@SuppressWarnings("rawtypes")
 	@Override
 	public List<SpotlightItem<?>> getItems(SpotlightItemsFilter filter, IProgressMonitor monitor) {
-		List<SpotlightItem<?>> items = new ArrayList<>();
-		ICommandService commandService = PlatformUI.getWorkbench().getService(ICommandService.class);
-		final Collection commandIds = commandService.getDefinedCommandIds();
-		final Iterator commandIdItr = commandIds.iterator();
-		while (commandIdItr.hasNext()) {
-			final String currentCommandId = (String) commandIdItr.next();
-			final Command command = commandService.getCommand(currentCommandId);
-			if (command != null) {
-				try {
-					Collection combinations = ParameterizedCommand.generateCombinations(command);
-					for (Iterator it = combinations.iterator(); it.hasNext();) {
-						ParameterizedCommand pc = (ParameterizedCommand) it.next();
-						if (pc.getCommand().isDefined() && pc.getCommand().isEnabled()) {
-							// only add commands that can be executed
-							items.add(new CommandItem(this, pc));
+		try {
+			List<SpotlightItem<?>> items = new ArrayList<>();
+			ICommandService commandService = PlatformUI.getWorkbench().getService(ICommandService.class);
+			final Collection commandIds = commandService.getDefinedCommandIds();
+			monitor.beginTask(null, commandIds.size());
+			final Iterator commandIdItr = commandIds.iterator();
+			while (commandIdItr.hasNext()) {
+				final String currentCommandId = (String) commandIdItr.next();
+				final Command command = commandService.getCommand(currentCommandId);
+				if (command != null) {
+					try {
+						Collection combinations = ParameterizedCommand.generateCombinations(command);
+						for (Iterator it = combinations.iterator(); it.hasNext();) {
+							ParameterizedCommand pc = (ParameterizedCommand) it.next();
+							if (pc.getCommand().isDefined() && pc.getCommand().isEnabled()) {
+								// only add commands that can be executed
+								items.add(new CommandItem(this, pc));
+							}
 						}
+					} catch (final NotDefinedException e) {
+						// we do not add undefined commands because they are
+						// invalid
 					}
-				} catch (final NotDefinedException e) {
-					// we do not add undefined commands because they are invalid
 				}
+				monitor.worked(1);
 			}
+			return items;
+		} finally {
+			monitor.done();
 		}
-		return items;
 	}
 
 	public ICommandImageService getCommandImageService() {

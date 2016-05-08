@@ -21,11 +21,17 @@ public class ViewProvider implements SpotlightItemProvider {
 	@Override
 	public List<SpotlightItem<?>> getItems(SpotlightItemsFilter filter, IProgressMonitor monitor) {
 		IViewDescriptor[] views = PlatformUI.getWorkbench().getViewRegistry().getViews();
-		List<SpotlightItem<?>> items = new ArrayList<>();
-		for (IViewDescriptor view : views) {
-			items.add(new ViewItem(this, view));
+		try {
+			monitor.beginTask(null, views.length);
+			List<SpotlightItem<?>> items = new ArrayList<>();
+			for (IViewDescriptor view : views) {
+				items.add(new ViewItem(this, view));
+				monitor.worked(1);
+			}
+			return items;
+		} finally {
+			monitor.done();
 		}
-		return items;
 	}
 
 	@Override

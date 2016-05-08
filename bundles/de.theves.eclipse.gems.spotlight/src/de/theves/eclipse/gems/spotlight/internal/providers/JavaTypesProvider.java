@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.WorkingCopyOwner;
 import org.eclipse.jdt.core.search.IJavaSearchConstants;
@@ -39,7 +38,7 @@ public class JavaTypesProvider implements SpotlightItemProvider {
 						public void acceptTypeNameMatch(TypeNameMatch match) {
 							items.add(new JavaTypeItem(JavaTypesProvider.this, match));
 						}
-					}, IJavaSearchConstants.WAIT_UNTIL_READY_TO_SEARCH, new NullProgressMonitor());
+					}, IJavaSearchConstants.WAIT_UNTIL_READY_TO_SEARCH, monitor);
 		} catch (JavaModelException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.ProgressMonitorWrapper;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
@@ -34,6 +34,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
@@ -62,18 +63,29 @@ public class SpotlightPopupDialog extends PopupDialog {
 	private SpotlightItemViewerFilter viewerFilter;
 	private TableViewer tableViewer;
 	private Text text;
-	private SearchItemsJob job;
+	private SearchItemsJob searchItemsJob;
 	private ProgressBar progressbar;
 	protected UpdateUIJob uiJob;
+	public RefreshProgressBarJob refreshProgressBarJob;
 
 	public SpotlightPopupDialog(Shell parent, IWorkbenchWindow window) {
 		super(parent, SWT.RESIZE, true, true, true, false, false, null, null);
 		this.window = window;
-		this.job = new SearchItemsJob();
-		this.job.setSystem(true);
 		providers = new SpotlightItemProvider[] { new ViewProvider(), new ResourcesProvider(),
 				new PerspectivesProvider(), new ActionsProvider(this.window), new CommandProvider(this.window),
 				new JavaTypesProvider() };
+
+		refreshProgressBarJob = new RefreshProgressBarJob(parent.getDisplay());
+		uiJob = new UpdateUIJob(parent.getDisplay());
+		searchItemsJob = new SearchItemsJob();
+		searchItemsJob.addJobChangeListener(new JobChangeAdapter() {
+			@Override
+			public void done(IJobChangeEvent event) {
+				uiJob.cancel();
+				uiJob.setItems(searchItemsJob.getItems());
+				uiJob.schedule(200);
+			}
+		});
 	}
 
 	@Override
@@ -231,73 +243,121 @@ public class SpotlightPopupDialog extends PopupDialog {
 		filter = new SpotlightItemsFilter(text.getText());
 		viewerFilter.setFilter(filter);
 
-		if (job != null) {
-			job.cancel();
-		}
-		job = new SearchItemsJob();
-		job.addJobChangeListener(new JobChangeAdapter() {
-			@Override
-			public void done(IJobChangeEvent event) {
-				if (uiJob != null) {
-					uiJob.cancel();
-				}
-				uiJob = new UpdateUIJob(job.getItems());
-				uiJob.schedule();
-			}
-		});
-		job.schedule();
-
+		searchItemsJob.cancel();
+		searchItemsJob.schedule(200);
 	}
 
 	private class UpdateUIJob extends UIJob {
-		private SpotlightItem[] items;
+		private SpotlightItem<?>[] items;
 
-		public UpdateUIJob(SpotlightItem[] items) {
-			super("Spotlight Update");
+		public UpdateUIJob(Display d) {
+			super(d, "Spotlight input");
 			setSystem(true);
+		}
+
+		public void setItems(SpotlightItem<?>[] items) {
 			this.items = items;
 		}
 
 		@Override
 		public IStatus runInUIThread(IProgressMonitor monitor) {
-			IProgressMonitor pm = monitor != null ? monitor : new NullProgressMonitor();
-			try {
-				pm.beginTask(null, 3);
-				progressbar.setSelection(0);
-				tableViewer.getTable().setRedraw(false);
-				progressbar.setSelection(33);
-				progressbar.setSelection(66);
-				tableViewer.setInput(this.items);
-				tableViewer.getTable().setRedraw(true);
-				pm.worked(1);
-				progressbar.setSelection(100);
-				return Status.OK_STATUS;
-			} finally {
-				pm.done();
-			}
+			tableViewer.setInput(this.items);
+			return Status.OK_STATUS;
 		}
 
 	}
 
 	private class SearchItemsJob extends Job {
-
 		private SpotlightItem<?>[] items;
 
 		public SearchItemsJob() {
-			super("Spotlight-Search");
+			super("Spotlight search");
 			setSystem(true);
 		}
 
 		@Override
 		protected IStatus run(IProgressMonitor monitor) {
-			items = listItems(monitor);
+			items = listItems(filter, new ReportingProgressMonitor(monitor));
 			return Status.OK_STATUS;
 		}
 
 		public SpotlightItem<?>[] getItems() {
 			return items;
 		}
+	}
 
+	private class RefreshProgressBarJob extends UIJob {
+		private ReportingProgressMonitor reportingMonitor;
+
+		public RefreshProgressBarJob(Display d) {
+			super(d, "Spotlight refresh");
+			setSystem(true);
+		}
+
+		@Override
+		public IStatus runInUIThread(IProgressMonitor monitor) {
+			if (!progressbar.isDisposed()) {
+				int maximum = progressbar.getMaximum();
+				if (ReportingProgressMonitor.TOTAL_WORK_LOAD != maximum) {
+					progressbar.setMaximum(ReportingProgressMonitor.TOTAL_WORK_LOAD);
+					progressbar.setSelection(0);
+				}
+				progressbar.setSelection(this.reportingMonitor.getWorked());
+			}
+
+			if (this.reportingMonitor.isCanceled() || this.reportingMonitor.isDone()) {
+				return Status.CANCEL_STATUS;
+			}
+
+			// schedule periodically with delay
+			schedule(500);
+
+			return Status.OK_STATUS;
+		}
+
+		public void scheduleProgressBarRefresh(ReportingProgressMonitor monitor) {
+			this.reportingMonitor = monitor;
+			// schedule with a short delay to avoid flickering
+			schedule(200);
+		}
+
+	}
+
+	private class ReportingProgressMonitor extends ProgressMonitorWrapper {
+		public static final int TOTAL_WORK_LOAD = 10000;
+		private int worked = 0;
+
+		protected ReportingProgressMonitor(IProgressMonitor monitor) {
+			super(monitor);
+		}
+
+		public boolean isDone() {
+			return worked == TOTAL_WORK_LOAD;
+		}
+
+		@Override
+		public void beginTask(String name, int totalWork) {
+			super.beginTask(name, totalWork);
+			if (refreshProgressBarJob != null) {
+				refreshProgressBarJob.scheduleProgressBarRefresh(this);
+			}
+		}
+
+		@Override
+		public void done() {
+			super.done();
+			this.worked = TOTAL_WORK_LOAD;
+		}
+
+		@Override
+		public void internalWorked(double work) {
+			super.internalWorked(work);
+			this.worked = (int) (work * TOTAL_WORK_LOAD);
+		}
+
+		public int getWorked() {
+			return worked;
+		}
 	}
 
 	@Override
@@ -305,17 +365,38 @@ public class SpotlightPopupDialog extends PopupDialog {
 		if (resourceManager != null) {
 			resourceManager.dispose();
 		}
+		cancelAllJobs();
 		uiJob = null;
-		job = null;
+		searchItemsJob = null;
+		refreshProgressBarJob = null;
 		return super.close();
 	}
 
-	private SpotlightItem<?>[] listItems(IProgressMonitor monitor) {
+	private void cancelAllJobs() {
+		Job[] jobs = new Job[] { uiJob, searchItemsJob, refreshProgressBarJob };
+		for (Job job : jobs) {
+			int retries = 3;
+			while (retries > 0) {
+				try {
+					boolean canceled = job.cancel();
+					if (!canceled) {
+						Thread.sleep(100);
+					}
+				} catch (InterruptedException e) {
+					// ignore this one
+				} finally {
+					retries--;
+				}
+			}
+		}
+	}
+
+	private SpotlightItem<?>[] listItems(SpotlightItemsFilter filter, IProgressMonitor monitor) {
 		monitor.beginTask(null, providers.length);
 		try {
 			List<SpotlightItem<?>> result = new ArrayList<>();
 			for (SpotlightItemProvider provider : providers) {
-				List<SpotlightItem<?>> items = provider.getItems(this.filter, new SubProgressMonitor(monitor, 1));
+				List<SpotlightItem<?>> items = provider.getItems(filter, new SubProgressMonitor(monitor, 1));
 				result.addAll(items);
 			}
 			return result.toArray(new SpotlightItem[result.size()]);

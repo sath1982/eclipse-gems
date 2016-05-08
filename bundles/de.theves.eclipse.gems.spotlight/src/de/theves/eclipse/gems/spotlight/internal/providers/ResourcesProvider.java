@@ -38,6 +38,8 @@ public class ResourcesProvider implements SpotlightItemProvider {
 		} catch (CoreException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} finally {
+			monitor.done();
 		}
 		return items;
 	}

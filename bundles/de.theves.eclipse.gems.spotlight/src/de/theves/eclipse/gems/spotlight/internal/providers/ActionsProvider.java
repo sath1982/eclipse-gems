@@ -26,19 +26,25 @@ public class ActionsProvider implements SpotlightItemProvider {
 
 	@Override
 	public List<SpotlightItem<?>> getItems(SpotlightItemsFilter filter, IProgressMonitor monitor) {
-		List<SpotlightItem<?>> items = new ArrayList<>();
-		IWorkbenchWindow window = this.window;
-		if (window instanceof ApplicationWindow) {
-			MenuManager menu = ((ApplicationWindow) window).getMenuBarManager();
-			Set<ActionContributionItem> result = new HashSet<ActionContributionItem>();
-			collectContributions(menu, result);
-			for (ActionContributionItem action : result) {
-				items.add(new ActionItem(this, action));
+		try {
+			monitor.beginTask(null, 1);
+			List<SpotlightItem<?>> items = new ArrayList<>();
+			IWorkbenchWindow window = this.window;
+			if (window instanceof ApplicationWindow) {
+				MenuManager menu = ((ApplicationWindow) window).getMenuBarManager();
+				Set<ActionContributionItem> result = new HashSet<ActionContributionItem>();
+				collectContributions(menu, result);
+				for (ActionContributionItem action : result) {
+					items.add(new ActionItem(this, action));
+				}
 			}
+			monitor.worked(1);
+			return items;
+		} finally {
+			monitor.done();
 		}
-		return items;
 	}
-	
+
 	@Override
 	public int getCategory() {
 		return CATEGORY_ACTIONS;

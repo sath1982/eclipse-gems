@@ -20,12 +20,19 @@ public class PerspectivesProvider implements SpotlightItemProvider {
 
 	@Override
 	public List<SpotlightItem<?>> getItems(SpotlightItemsFilter filter, IProgressMonitor monitor) {
-		IPerspectiveDescriptor[] perspectives = PlatformUI.getWorkbench().getPerspectiveRegistry().getPerspectives();
-		List<SpotlightItem<?>> items = new ArrayList<>();
-		for (IPerspectiveDescriptor perspective : perspectives) {
-			items.add(new PerspectiveItem(this, perspective));
+		try {
+			IPerspectiveDescriptor[] perspectives = PlatformUI.getWorkbench().getPerspectiveRegistry()
+					.getPerspectives();
+			monitor.beginTask(null, perspectives.length);
+			List<SpotlightItem<?>> items = new ArrayList<>();
+			for (IPerspectiveDescriptor perspective : perspectives) {
+				items.add(new PerspectiveItem(this, perspective));
+				monitor.worked(1);
+			}
+			return items;
+		} finally {
+			monitor.done();
 		}
-		return items;
 	}
 
 	@Override
