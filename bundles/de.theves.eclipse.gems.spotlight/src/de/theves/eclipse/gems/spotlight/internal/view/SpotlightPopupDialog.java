@@ -1,6 +1,5 @@
 package de.theves.eclipse.gems.spotlight.internal.view;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -16,15 +15,12 @@ import org.eclipse.jface.dialogs.PopupDialog;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.jface.resource.ResourceManager;
-import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
-import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
-import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
@@ -110,36 +106,6 @@ public class SpotlightPopupDialog extends PopupDialog {
 		contentProvider = new CachingContentProvider(tableViewer);
 		tableViewer.setContentProvider(contentProvider);
 		tableViewer.setLabelProvider(new LabelProvider());
-
-		tableViewer.setComparator(new ViewerComparator() {
-			@Override
-			public int category(Object element) {
-				if (element == null) {
-					return -1;
-				}
-				return ((SpotlightItem<?>) element).getProvider().getCategory();
-			}
-
-			@Override
-			public int compare(Viewer viewer, Object e1, Object e2) {
-				if (e1 == null) {
-					return -1;
-				}
-				if (e2 == null) {
-					return 1;
-				}
-				int cat1 = category(e1);
-				int cat2 = category(e2);
-
-				if (cat1 != cat2) {
-					return cat1 - cat2;
-				}
-
-				SpotlightItem<?> i1 = (SpotlightItem<?>) e1;
-				SpotlightItem<?> i2 = (SpotlightItem<?>) e2;
-				return i1.compareTo(i2);
-			}
-		});
 
 		createColumns();
 
