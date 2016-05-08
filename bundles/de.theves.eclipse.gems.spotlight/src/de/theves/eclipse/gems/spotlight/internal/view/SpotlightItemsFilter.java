@@ -18,25 +18,6 @@ public class SpotlightItemsFilter {
 		patternMatcher.setPattern(stringPattern);
 	}
 
-	public boolean matchesRawNamePattern(SpotlightItem<?> item) {
-		String prefix = patternMatcher.getPattern();
-		String text = item.getElementName();
-
-		if (text == null)
-			return false;
-
-		int textLength = text.length();
-		int prefixLength = prefix.length();
-		if (textLength < prefixLength) {
-			return false;
-		}
-		for (int i = prefixLength - 1; i >= 0; i--) {
-			if (Character.toLowerCase(prefix.charAt(i)) != Character.toLowerCase(text.charAt(i)))
-				return false;
-		}
-		return true;
-	}
-
 	protected boolean matches(String text) {
 		return patternMatcher.matches(text);
 	}
@@ -48,4 +29,16 @@ public class SpotlightItemsFilter {
 	public boolean isCamelCasePattern() {
 		return patternMatcher.getMatchRule() == SearchPattern.RULE_CAMELCASE_MATCH;
 	}
+
+	public boolean isSubFilter(SpotlightItemsFilter other) {
+		String otherPattern = other.getPattern();
+		String pattern = getPattern();
+		return pattern.startsWith(otherPattern);
+	}
+
+	@Override
+	public String toString() {
+		return "SpotlightItemsFilter [pattern=" + patternMatcher.getPattern() + "]";
+	}
+
 }

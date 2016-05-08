@@ -52,7 +52,7 @@ public class SpotlightPopupDialog extends PopupDialog {
 	private SpotlightItemsFilter filter;
 	private TableViewer tableViewer;
 	private Text text;
-	private RefreshCacheJob searchItemsJob;
+	private RefreshCacheJob refreshCacheJob;
 	private ProgressBar progressbar;
 	protected UpdateUIJob uiJob;
 	public RefreshProgressBarJob refreshProgressBarJob;
@@ -63,7 +63,7 @@ public class SpotlightPopupDialog extends PopupDialog {
 		this.window = window;
 		refreshProgressBarJob = new RefreshProgressBarJob(parent.getDisplay());
 		uiJob = new UpdateUIJob(parent.getDisplay());
-		searchItemsJob = new RefreshCacheJob();
+		refreshCacheJob = new RefreshCacheJob();
 	}
 
 	@Override
@@ -203,16 +203,9 @@ public class SpotlightPopupDialog extends PopupDialog {
 
 	private void updateViewer(final Text text) {
 		progressbar.setSelection(0);
-
-		if (text.getText() == null || text.getText().isEmpty()) {
-			tableViewer.setInput(EMPTY_ARRAY);
-			return;
-		}
-
 		filter.setPattern(text.getText());
-
-		searchItemsJob.cancelAll();
-		searchItemsJob.schedule(200);
+		refreshCacheJob.cancelAll();
+		refreshCacheJob.schedule(200);
 	}
 
 	private class UpdateUIJob extends UIJob {
@@ -246,14 +239,19 @@ public class SpotlightPopupDialog extends PopupDialog {
 			setSystem(true);
 		}
 
-		public boolean cancelAll() {
-			boolean uiCanceled = uiJob.cancel();
-			return cancel() && uiCanceled;
+		public void cancelAll() {
+			cancel();
+			uiJob.cancel();
 		}
 
 		@Override
 		protected IStatus run(IProgressMonitor monitor) {
+			if (monitor.isCanceled()) {
+				monitor.done();
+				return Status.CANCEL_STATUS;
+			}
 			ReportingProgressMonitor reportingProgressMonitor = new ReportingProgressMonitor(monitor);
+			contentProvider.reset();
 			contentProvider.reloadCache(SpotlightPopupDialog.this.filter, reportingProgressMonitor);
 			if (reportingProgressMonitor.isCanceled()) {
 				return Status.CANCEL_STATUS;
@@ -348,13 +346,13 @@ public class SpotlightPopupDialog extends PopupDialog {
 		}
 		cancelAllJobs();
 		uiJob = null;
-		searchItemsJob = null;
+		refreshCacheJob = null;
 		refreshProgressBarJob = null;
 		return super.close();
 	}
 
 	private void cancelAllJobs() {
-		Job[] jobs = new Job[] { uiJob, searchItemsJob, refreshProgressBarJob };
+		Job[] jobs = new Job[] { uiJob, refreshCacheJob, refreshProgressBarJob };
 		for (Job job : jobs) {
 			int retries = 3;
 			while (retries > 0) {

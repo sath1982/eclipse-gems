@@ -16,14 +16,13 @@ public class CachingContentProvider implements IStructuredContentProvider, ILazy
 	private List<SpotlightItem<?>> elements;
 	private TableViewer viewer;
 	private final SpotlightItemProvider[] providers;
-	private SpotlightItemsFilter lastUsedFilter;
 	private boolean reset;
 
 	public CachingContentProvider(TableViewer viewer, SpotlightItemProvider[] providers) {
 		this.viewer = viewer;
-		this.elements = new ArrayList<>();
+		this.elements = Collections.synchronizedList(new ArrayList<>());
 		this.providers = providers;
-		this.reset = false;
+		this.reset = true;
 	}
 
 	@Override
@@ -42,30 +41,37 @@ public class CachingContentProvider implements IStructuredContentProvider, ILazy
 	}
 
 	public void reloadCache(SpotlightItemsFilter filter, IProgressMonitor monitor) {
-		// TODO check if the given filter is a sub-filter of the last one and
-		// just filter the last search result
-		this.lastUsedFilter = filter;
-		listItems(filter, monitor);
+		reset = false;
+		// TODO only re-run the search if the new filter is not a sub filter of
+		// the
+		// previously used one
+		if (filter.getPattern() != null && !filter.getPattern().isEmpty()) {
+			listItems(filter, monitor);
+			sort();
+		}
 	}
 
 	private void listItems(SpotlightItemsFilter filter, IProgressMonitor monitor) {
 		monitor.beginTask(null, providers.length * 100);
-		reset();
 		try {
 			for (SpotlightItemProvider provider : providers) {
 				List<SpotlightItem<?>> items = provider.getItems(filter, new SubProgressMonitor(monitor, 100));
-				for (SpotlightItem<?> spotlightItem : items) {
-					addElement(spotlightItem, filter);
-				}
-				if (monitor.isCanceled() || !reset) {
+				addFilteredElements(filter, items);
+				if (monitor.isCanceled() || reset) {
+					monitor.done();
 					return;
 				}
 			}
-			sort();
 		} catch (OperationCanceledException e) {
 			return;
 		} finally {
 			monitor.done();
+		}
+	}
+
+	public void addFilteredElements(SpotlightItemsFilter filter, List<SpotlightItem<?>> items) {
+		for (SpotlightItem<?> spotlightItem : items) {
+			addElement(spotlightItem, filter);
 		}
 	}
 
@@ -80,8 +86,8 @@ public class CachingContentProvider implements IStructuredContentProvider, ILazy
 	}
 
 	public void reset() {
-		elements.clear();
 		this.reset = true;
+		this.elements.clear();
 	}
 
 	public int getNumberOfElements() {
@@ -98,7 +104,7 @@ public class CachingContentProvider implements IStructuredContentProvider, ILazy
 	}
 
 	public void stopReloadProgress() {
-		this.reset = false;
+		this.reset = true;
 	}
 
 }
