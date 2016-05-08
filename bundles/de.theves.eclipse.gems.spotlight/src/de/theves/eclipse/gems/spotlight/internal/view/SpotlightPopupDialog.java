@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.ProgressMonitorWrapper;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubProgressMonitor;
@@ -17,6 +18,7 @@ import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.jface.resource.ResourceManager;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CellLabelProvider;
+import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
@@ -60,13 +62,13 @@ public class SpotlightPopupDialog extends PopupDialog {
 	private ResourceManager resourceManager;
 	private IWorkbenchWindow window;
 	private SpotlightItemsFilter filter;
-	private SpotlightItemViewerFilter viewerFilter;
 	private TableViewer tableViewer;
 	private Text text;
 	private SearchItemsJob searchItemsJob;
 	private ProgressBar progressbar;
 	protected UpdateUIJob uiJob;
 	public RefreshProgressBarJob refreshProgressBarJob;
+	private CachingContentProvider contentProvider;
 
 	public SpotlightPopupDialog(Shell parent, IWorkbenchWindow window) {
 		super(parent, SWT.RESIZE, true, true, true, false, false, null, null);
@@ -81,8 +83,13 @@ public class SpotlightPopupDialog extends PopupDialog {
 		searchItemsJob.addJobChangeListener(new JobChangeAdapter() {
 			@Override
 			public void done(IJobChangeEvent event) {
+				IStatus result = event.getResult();
+
+				if (result.getCode() == IStatus.CANCEL) {
+					return;
+				}
+
 				uiJob.cancel();
-				uiJob.setItems(searchItemsJob.getItems());
 				uiJob.schedule(200);
 			}
 		});
@@ -98,20 +105,29 @@ public class SpotlightPopupDialog extends PopupDialog {
 		progressbar.setLayoutData(new GridData(SWT.FILL, SWT.NONE, true, false));
 
 		this.filter = new SpotlightItemsFilter(text.getText());
-		this.viewerFilter = new SpotlightItemViewerFilter(filter);
-		tableViewer = new TableViewer(this.composite, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
+		tableViewer = new TableViewer(this.composite, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.VIRTUAL);
 		tableViewer.getControl().setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, true));
-		tableViewer.setContentProvider(ArrayContentProvider.getInstance());
-		tableViewer.addFilter(viewerFilter);
+		contentProvider = new CachingContentProvider(tableViewer);
+		tableViewer.setContentProvider(contentProvider);
+		tableViewer.setLabelProvider(new LabelProvider());
 
 		tableViewer.setComparator(new ViewerComparator() {
 			@Override
 			public int category(Object element) {
+				if (element == null) {
+					return -1;
+				}
 				return ((SpotlightItem<?>) element).getProvider().getCategory();
 			}
 
 			@Override
 			public int compare(Viewer viewer, Object e1, Object e2) {
+				if (e1 == null) {
+					return -1;
+				}
+				if (e2 == null) {
+					return 1;
+				}
 				int cat1 = category(e1);
 				int cat2 = category(e2);
 
@@ -159,6 +175,7 @@ public class SpotlightPopupDialog extends PopupDialog {
 		});
 
 		tableViewer.setUseHashlookup(true);
+		tableViewer.setItemCount(0);
 		tableViewer.setInput(EMPTY_ARRAY);
 
 		this.composite.pack();
@@ -190,9 +207,11 @@ public class SpotlightPopupDialog extends PopupDialog {
 			public void keyPressed(KeyEvent e) {
 				if (e.keyCode == SWT.ARROW_DOWN) {
 					Object elementAt = tableViewer.getElementAt(0);
-					tableViewer.getTable().setFocus();
-					tableViewer.getTable().setCapture(true);
-					tableViewer.setSelection(new StructuredSelection(elementAt), true);
+					if (elementAt != null) {
+						tableViewer.getTable().setFocus();
+						tableViewer.getTable().setCapture(true);
+						tableViewer.setSelection(new StructuredSelection(elementAt), true);
+					}
 				}
 			}
 		});
@@ -224,7 +243,6 @@ public class SpotlightPopupDialog extends PopupDialog {
 		TableViewerColumn itemsCol = new TableViewerColumn(tableViewer, SWT.NONE);
 		itemsCol.getColumn().setWidth(200);
 		itemsCol.setLabelProvider(new CellLabelProvider() {
-
 			@Override
 			public void update(ViewerCell cell) {
 				SpotlightItem<?> item = (SpotlightItem<?>) cell.getElement();
@@ -243,35 +261,35 @@ public class SpotlightPopupDialog extends PopupDialog {
 		}
 
 		filter = new SpotlightItemsFilter(text.getText());
-		viewerFilter.setFilter(filter);
 
 		searchItemsJob.cancel();
 		searchItemsJob.schedule(200);
 	}
 
 	private class UpdateUIJob extends UIJob {
-		private SpotlightItem<?>[] items;
 
 		public UpdateUIJob(Display d) {
 			super(d, "Spotlight input");
 			setSystem(true);
 		}
 
-		public void setItems(SpotlightItem<?>[] items) {
-			this.items = items;
-		}
-
 		@Override
 		public IStatus runInUIThread(IProgressMonitor monitor) {
-			tableViewer.setInput(this.items);
+			if (tableViewer.getTable().isDisposed() || tableViewer.isBusy()) {
+				return Status.CANCEL_STATUS;
+			}
+			tableViewer.getTable().setRedraw(false);
+			tableViewer.getTable().deselectAll();
+			tableViewer.setItemCount(contentProvider.getNumberOfElements());
+			tableViewer.refresh();
+			tableViewer.setSelection(StructuredSelection.EMPTY);
+			tableViewer.getTable().setRedraw(true);
 			return Status.OK_STATUS;
 		}
 
 	}
 
 	private class SearchItemsJob extends Job {
-		private SpotlightItem<?>[] items;
-
 		public SearchItemsJob() {
 			super("Spotlight search");
 			setSystem(true);
@@ -279,12 +297,11 @@ public class SpotlightPopupDialog extends PopupDialog {
 
 		@Override
 		protected IStatus run(IProgressMonitor monitor) {
-			items = listItems(filter, new ReportingProgressMonitor(monitor));
+			listItems(filter, new ReportingProgressMonitor(monitor));
+			if (monitor.isCanceled()) {
+				return Status.CANCEL_STATUS;
+			}
 			return Status.OK_STATUS;
-		}
-
-		public SpotlightItem<?>[] getItems() {
-			return items;
 		}
 	}
 
@@ -393,15 +410,22 @@ public class SpotlightPopupDialog extends PopupDialog {
 		}
 	}
 
-	private SpotlightItem<?>[] listItems(SpotlightItemsFilter filter, IProgressMonitor monitor) {
-		monitor.beginTask(null, providers.length);
+	private void listItems(SpotlightItemsFilter filter, IProgressMonitor monitor) {
+		monitor.beginTask(null, providers.length * 100);
+		contentProvider.reset();
 		try {
-			List<SpotlightItem<?>> result = new ArrayList<>();
 			for (SpotlightItemProvider provider : providers) {
-				List<SpotlightItem<?>> items = provider.getItems(filter, new SubProgressMonitor(monitor, 1));
-				result.addAll(items);
+				List<SpotlightItem<?>> items = provider.getItems(filter, new SubProgressMonitor(monitor, 100));
+				if (monitor.isCanceled()) {
+					return;
+				}
+				for (SpotlightItem<?> spotlightItem : items) {
+					contentProvider.addElement(spotlightItem, filter);
+				}
 			}
-			return result.toArray(new SpotlightItem[result.size()]);
+			contentProvider.sort();
+		} catch (OperationCanceledException e) {
+			return;
 		} finally {
 			monitor.done();
 		}

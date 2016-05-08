@@ -19,6 +19,9 @@ public abstract class SpotlightItem<I> implements Comparable<SpotlightItem<?>> {
 
 	@Override
 	public int compareTo(SpotlightItem<?> i2) {
+		if (getProvider().getCategory() != i2.getProvider().getCategory()) {
+			return getProvider().getCategory() - i2.getProvider().getCategory();
+		}
 		return getLabel().compareTo(i2.getLabel());
 	}
 
