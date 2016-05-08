@@ -235,11 +235,13 @@ public class SpotlightPopupDialog extends PopupDialog {
 	}
 
 	private void updateViewer(final Text text) {
+		progressbar.setSelection(0);
+
 		if (text.getText() == null || text.getText().isEmpty()) {
 			tableViewer.setInput(EMPTY_ARRAY);
-			progressbar.setSelection(0);
 			return;
 		}
+
 		filter = new SpotlightItemsFilter(text.getText());
 		viewerFilter.setFilter(filter);
 
