@@ -1,16 +1,10 @@
 package de.theves.eclipse.gems.spotlight.internal.view;
 
-import java.util.List;
-
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.ProgressMonitorWrapper;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.SubProgressMonitor;
-import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.jface.dialogs.PopupDialog;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
@@ -52,15 +46,13 @@ public class SpotlightPopupDialog extends PopupDialog {
 
 	private static final Object[] EMPTY_ARRAY = new Object[0];
 
-	private final SpotlightItemProvider[] providers;
-
 	private Composite composite;
 	private ResourceManager resourceManager;
 	private IWorkbenchWindow window;
 	private SpotlightItemsFilter filter;
 	private TableViewer tableViewer;
 	private Text text;
-	private SearchItemsJob searchItemsJob;
+	private RefreshCacheJob searchItemsJob;
 	private ProgressBar progressbar;
 	protected UpdateUIJob uiJob;
 	public RefreshProgressBarJob refreshProgressBarJob;
@@ -69,26 +61,9 @@ public class SpotlightPopupDialog extends PopupDialog {
 	public SpotlightPopupDialog(Shell parent, IWorkbenchWindow window) {
 		super(parent, SWT.RESIZE, true, true, true, false, false, null, null);
 		this.window = window;
-		providers = new SpotlightItemProvider[] { new ViewProvider(), new ResourcesProvider(),
-				new PerspectivesProvider(), new ActionsProvider(this.window), new CommandProvider(this.window),
-				new JavaTypesProvider() };
-
 		refreshProgressBarJob = new RefreshProgressBarJob(parent.getDisplay());
 		uiJob = new UpdateUIJob(parent.getDisplay());
-		searchItemsJob = new SearchItemsJob();
-		searchItemsJob.addJobChangeListener(new JobChangeAdapter() {
-			@Override
-			public void done(IJobChangeEvent event) {
-				IStatus result = event.getResult();
-
-				if (result.getCode() == IStatus.CANCEL) {
-					return;
-				}
-
-				uiJob.cancel();
-				uiJob.schedule(200);
-			}
-		});
+		searchItemsJob = new RefreshCacheJob();
 	}
 
 	@Override
@@ -99,13 +74,21 @@ public class SpotlightPopupDialog extends PopupDialog {
 
 		progressbar = new ProgressBar(this.composite, SWT.SMOOTH);
 		progressbar.setLayoutData(new GridData(SWT.FILL, SWT.NONE, true, false));
+		progressbar.setMaximum(ReportingProgressMonitor.TOTAL_WORK_LOAD);
+		progressbar.setMinimum(0);
+		progressbar.setSelection(0);
+
+		SpotlightItemProvider[] providers = new SpotlightItemProvider[] { new ViewProvider(), new ResourcesProvider(),
+				new PerspectivesProvider(), new ActionsProvider(this.window), new CommandProvider(this.window),
+				new JavaTypesProvider() };
 
 		this.filter = new SpotlightItemsFilter(text.getText());
 		tableViewer = new TableViewer(this.composite, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.VIRTUAL);
 		tableViewer.getControl().setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, true));
-		contentProvider = new CachingContentProvider(tableViewer);
-		tableViewer.setContentProvider(contentProvider);
+
 		tableViewer.setLabelProvider(new LabelProvider());
+		contentProvider = new CachingContentProvider(tableViewer, providers);
+		tableViewer.setContentProvider(contentProvider);
 
 		createColumns();
 
@@ -226,9 +209,9 @@ public class SpotlightPopupDialog extends PopupDialog {
 			return;
 		}
 
-		filter = new SpotlightItemsFilter(text.getText());
+		filter.setPattern(text.getText());
 
-		searchItemsJob.cancel();
+		searchItemsJob.cancelAll();
 		searchItemsJob.schedule(200);
 	}
 
@@ -244,30 +227,48 @@ public class SpotlightPopupDialog extends PopupDialog {
 			if (tableViewer.getTable().isDisposed() || tableViewer.isBusy()) {
 				return Status.CANCEL_STATUS;
 			}
-			tableViewer.getTable().setRedraw(false);
+			// tableViewer.getTable().setRedraw(false);
 			tableViewer.getTable().deselectAll();
 			tableViewer.setItemCount(contentProvider.getNumberOfElements());
 			tableViewer.refresh();
-			tableViewer.setSelection(StructuredSelection.EMPTY);
-			tableViewer.getTable().setRedraw(true);
+			if (contentProvider.getNumberOfElements() > 0) {
+				tableViewer.setSelection(new StructuredSelection(contentProvider.getElement(0)));
+			}
+			// tableViewer.getTable().setRedraw(true);
 			return Status.OK_STATUS;
 		}
 
 	}
 
-	private class SearchItemsJob extends Job {
-		public SearchItemsJob() {
+	private class RefreshCacheJob extends Job {
+		public RefreshCacheJob() {
 			super("Spotlight search");
 			setSystem(true);
 		}
 
+		public boolean cancelAll() {
+			boolean uiCanceled = uiJob.cancel();
+			return cancel() && uiCanceled;
+		}
+
 		@Override
 		protected IStatus run(IProgressMonitor monitor) {
-			listItems(filter, new ReportingProgressMonitor(monitor));
-			if (monitor.isCanceled()) {
+			ReportingProgressMonitor reportingProgressMonitor = new ReportingProgressMonitor(monitor);
+			contentProvider.reloadCache(SpotlightPopupDialog.this.filter, reportingProgressMonitor);
+			if (reportingProgressMonitor.isCanceled()) {
 				return Status.CANCEL_STATUS;
 			}
+			// schedule UI update for the reload
+			uiJob.cancel();
+			uiJob.schedule();
 			return Status.OK_STATUS;
+		}
+
+		@Override
+		protected void canceling() {
+			super.canceling();
+			// stop reloading cache and return asap
+			contentProvider.stopReloadProgress();
 		}
 	}
 
@@ -282,11 +283,6 @@ public class SpotlightPopupDialog extends PopupDialog {
 		@Override
 		public IStatus runInUIThread(IProgressMonitor monitor) {
 			if (!progressbar.isDisposed()) {
-				int maximum = progressbar.getMaximum();
-				if (ReportingProgressMonitor.TOTAL_WORK_LOAD != maximum) {
-					progressbar.setMaximum(ReportingProgressMonitor.TOTAL_WORK_LOAD);
-					progressbar.setSelection(0);
-				}
 				progressbar.setSelection(this.reportingMonitor.getWorked());
 			}
 
@@ -295,7 +291,7 @@ public class SpotlightPopupDialog extends PopupDialog {
 			}
 
 			// schedule periodically with delay
-			schedule(500);
+			schedule(100);
 
 			return Status.OK_STATUS;
 		}
@@ -309,7 +305,7 @@ public class SpotlightPopupDialog extends PopupDialog {
 	}
 
 	private class ReportingProgressMonitor extends ProgressMonitorWrapper {
-		public static final int TOTAL_WORK_LOAD = 10000;
+		public static final int TOTAL_WORK_LOAD = 100;
 		private int worked = 0;
 
 		protected ReportingProgressMonitor(IProgressMonitor monitor) {
@@ -373,27 +369,6 @@ public class SpotlightPopupDialog extends PopupDialog {
 					retries--;
 				}
 			}
-		}
-	}
-
-	private void listItems(SpotlightItemsFilter filter, IProgressMonitor monitor) {
-		monitor.beginTask(null, providers.length * 100);
-		contentProvider.reset();
-		try {
-			for (SpotlightItemProvider provider : providers) {
-				List<SpotlightItem<?>> items = provider.getItems(filter, new SubProgressMonitor(monitor, 100));
-				if (monitor.isCanceled()) {
-					return;
-				}
-				for (SpotlightItem<?> spotlightItem : items) {
-					contentProvider.addElement(spotlightItem, filter);
-				}
-			}
-			contentProvider.sort();
-		} catch (OperationCanceledException e) {
-			return;
-		} finally {
-			monitor.done();
 		}
 	}
 

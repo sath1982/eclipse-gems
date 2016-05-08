@@ -6,11 +6,11 @@ public class SpotlightItemsFilter {
 	protected SearchPattern patternMatcher;
 
 	public SpotlightItemsFilter(String pattern) {
-		this(new SearchPattern(), pattern);
+		patternMatcher = new SearchPattern();
+		setPattern(pattern);
 	}
 
-	public SpotlightItemsFilter(SearchPattern searchPattern, String pattern) {
-		patternMatcher = searchPattern;
+	public void setPattern(String pattern) {
 		String stringPattern = ""; //$NON-NLS-1$
 		if (pattern != null && !pattern.equals("*") && !pattern.isEmpty()) { //$NON-NLS-1$
 			stringPattern = pattern;
