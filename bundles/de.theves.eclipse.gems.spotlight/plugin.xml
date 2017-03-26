@@ -25,5 +25,19 @@
             commandId="de.theves.eclipse.gems.metasearch.openSearchDialogId">
       </handler>
    </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            class="de.theves.eclipse.gems.spotlight.preferences.SamplePreferencePage"
+            id="de.theves.eclipse.gems.spotlight.preferences.SamplePreferencePage"
+            name="Sample Preferences">
+      </page>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="de.theves.eclipse.gems.spotlight.preferences.PreferenceInitializer">
+      </initializer>
+   </extension>
 
 </plugin>

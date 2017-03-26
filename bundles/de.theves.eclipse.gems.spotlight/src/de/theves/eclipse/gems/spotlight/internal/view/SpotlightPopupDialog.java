@@ -37,6 +37,7 @@ import de.theves.eclipse.gems.spotlight.internal.providers.ActionsProvider;
 import de.theves.eclipse.gems.spotlight.internal.providers.CommandProvider;
 import de.theves.eclipse.gems.spotlight.internal.providers.JavaTypesProvider;
 import de.theves.eclipse.gems.spotlight.internal.providers.PerspectivesProvider;
+import de.theves.eclipse.gems.spotlight.internal.providers.PreferencesPageProvider;
 import de.theves.eclipse.gems.spotlight.internal.providers.ResourcesProvider;
 import de.theves.eclipse.gems.spotlight.internal.providers.ViewProvider;
 
@@ -80,7 +81,7 @@ public class SpotlightPopupDialog extends PopupDialog {
 
 		SpotlightItemProvider[] providers = new SpotlightItemProvider[] { new ViewProvider(), new ResourcesProvider(),
 				new PerspectivesProvider(), new ActionsProvider(this.window), new CommandProvider(this.window),
-				new JavaTypesProvider() };
+				new JavaTypesProvider(), new PreferencesPageProvider() };
 
 		this.filter = new SpotlightItemsFilter(text.getText());
 		tableViewer = new TableViewer(this.composite, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.VIRTUAL);

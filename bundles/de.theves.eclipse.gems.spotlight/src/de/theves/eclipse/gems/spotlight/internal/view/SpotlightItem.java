@@ -4,7 +4,7 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 
-public abstract class SpotlightItem<I> implements Comparable<SpotlightItem<?>> {
+public abstract class SpotlightItem<I> implements Comparable<SpotlightItem<I>> {
 	protected SpotlightItemProvider provider;
 	protected I item;
 
@@ -18,7 +18,7 @@ public abstract class SpotlightItem<I> implements Comparable<SpotlightItem<?>> {
 	}
 
 	@Override
-	public int compareTo(SpotlightItem<?> i2) {
+	public int compareTo(SpotlightItem<I> i2) {
 		if (getProvider().getCategory() != i2.getProvider().getCategory()) {
 			return getProvider().getCategory() - i2.getProvider().getCategory();
 		}
