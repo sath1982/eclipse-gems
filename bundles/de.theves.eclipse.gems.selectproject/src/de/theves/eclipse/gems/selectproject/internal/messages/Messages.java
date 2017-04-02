@@ -27,7 +27,7 @@ import org.eclipse.osgi.util.NLS;
  * @date: 25.04.2009 09:34:14
  */
 public class Messages extends NLS {
-	private static final String MESSAGES_NAME = "de.theves.selectproject.internal.messages.messages"; //$NON-NLS-1$
+	private static final String MESSAGES_NAME = "de.theves.eclipse.gems.selectproject.internal.messages.messages"; //$NON-NLS-1$
 
 	public static String OpenProjectAction_Title;
 
