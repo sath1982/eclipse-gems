@@ -79,7 +79,7 @@ public class SpotlightPopupDialog extends PopupDialog {
 		progressbar.setMinimum(0);
 		progressbar.setSelection(0);
 
-		SpotlightItemProvider[] providers = new SpotlightItemProvider[] { new ViewProvider(), new ResourcesProvider(),
+		SpotlightItemProvider<?>[] providers = new SpotlightItemProvider[] { new ViewProvider(), new ResourcesProvider(),
 				new PerspectivesProvider(), new ActionsProvider(this.window), new CommandProvider(this.window),
 				new JavaTypesProvider(), new PreferencesPageProvider() };
 
